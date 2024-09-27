@@ -12,11 +12,6 @@
 const styles = document.createElement('style');
 
 styles.innerHTML = `
-.xy-wrapper {
-  filter: blur(18px) grayscale(1);
-  display: none;
-}
-
 header {
   opacity: 1;
   transition: opacity 0.3s;
