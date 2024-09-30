@@ -6,7 +6,7 @@
 // @version     3.1
 // @license     GNU GPLv3
 // @author      zys52712
-// @description Show MFC classifieds as cards
+// @description Show MFC classifieds as cards, view & reply to listings without leaving the page
 // ==/UserScript==
 
 const styles = document.createElement('style');
