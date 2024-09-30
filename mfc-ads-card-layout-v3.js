@@ -436,6 +436,19 @@ header {
 
         .dgst .dgst-wrapper {
           flex-direction: column;
+          
+          a.dgst-icon {
+            position: initial;
+            
+            img {
+              transition: transform 0.5s;
+              position: absolute;
+              height: 100%;
+              object-fit: cover;
+              object-position: top;
+              border-radius: 8px;
+            }
+          }
         }
 
         .dgst-data {
@@ -468,15 +481,6 @@ header {
           .dgst-meta {
             column-gap: 5px;
           }
-        }
-
-        .dgst-wrapper a.dgst-icon img {
-          transition: transform 0.5s;
-          position: absolute;
-          height: 100%;
-          object-fit: cover;
-          object-position: top;
-          border-radius: 8px;
         }
 
         .dgst-anchor .tbx-tooltip,
@@ -551,9 +555,6 @@ header {
             font-size: 18px;
             /*min-width: 7ch;*/
             line-height: 24px;
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
           }
 
           .cost {
