@@ -3,7 +3,7 @@
 // @namespace   zys52712
 // @match       https://myfigurecollection.net/*
 // @grant       none
-// @version     3.0
+// @version     3.1
 // @license     GNU GPLv3
 // @author      zys52712
 // @description Show MFC classifieds as cards
