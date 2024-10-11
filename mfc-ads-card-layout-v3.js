@@ -1080,7 +1080,7 @@ function initialize() {
  
         if (j.htmlValues.TOOLTIP?.match(urlRegex)) {
           //tooltipA.parentElement.insertBefore(iconImg, tooltipA);
-          result.querySelector('img').src = j.htmlValues.TOOLTIP.match(urlRegex)[1];
+          result.querySelector('img').src = j.htmlValues.TOOLTIP.match(urlRegex)[1].replace('nsp.php?', '?_tb=commit&commit=nsp&').replace(/&amp;/g, '&');
           //console.log(j.htmlValues.TOOLTIP.match(urlRegex)[1])
           result.querySelector('img').onload = handleImageLoad;
         }
