@@ -16,15 +16,22 @@
             background: #222222;
             padding: 25px 40px;
             box-shadow: 0 2px 2px rgba(0, 0, 0, .1);
+            display: flex;
+            place-content: space-between;
 
             h1 {
                 margin: 0;
+            }
+
+            .buttons {
+                display: flex;
+                gap: 20px;
             }
         }
         .main-container {
             margin: 30px auto !important;
             padding: 8px;
-            width: 1280px;
+            width: 1600px;
             margin: auto;
             background: #222222;
             display: grid;
@@ -55,6 +62,10 @@
                         outline: none;
                     }
                 }
+
+                span:first-child {
+                    margin-left: 12px;
+                }
             }
 
             select {
@@ -80,10 +91,10 @@
                 }
             }
 
-            .image-container {
+            .images {
                 display: flex;
                 flex-wrap: wrap;
-                gap: 10px;
+                gap: 24px;
                 justify-content: center;
 
                 img {
@@ -91,34 +102,225 @@
                     object-fit: contain;
                     max-width: 512px;
                 }
-            }
 
-            button {
-                font-size: 16px;
-                cursor: pointer;
+                .image-container {
+                    padding: 6px;
+                    border: 2px solid var(--color);
+                    display: flex;
+                    --color: chartreuse;
+                    position: relative;
 
-                margin: 0 auto 25px;
-                padding: 4px 24px;
-                border: 0;
-                border-radius: 20px;
-                line-height: 32px;
-                cursor: pointer;
-                transition: opacity .2s ease;
-                font-weight: 700;
-                background-color: #555;
-                color: #eee;
+                    &:hover .tooltip{
+                        opacity: 1;
+                        transform: translate(-50%, calc(-100% - 16px));
+                    }
 
-                &.load-custom {
-                    margin: auto 0 auto auto;
+                    .tooltip {
+                        padding: 12px;
+                        position: absolute;
+                        left: 50%;
+                        transform: translate(-50%, -100%);
+                        background: rgba(33, 33, 33, .6);
+                        opacity: 0;
+
+                        position: absolute;
+                        width: 192px;
+                        z-index: 20;
+                        border-radius: 8px;
+                        white-space: normal;
+                        box-shadow: 0 0 10px rgba(0, 0, 0, .4);
+                        backdrop-filter: blur(6px);
+                        pointer-events: none;
+                        transition: opacity 0.3s, transform 0.3s;
+
+                        &:has(.error) {
+                            height: 192px;
+                        }
+
+                        ul {
+                            margin: 0;
+                            padding: 0;
+                            list-style: none;
+                        }
+
+                        * {
+                            color: white;
+                        }
+
+                        .title,
+                        ul li {
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                        }
+
+                        .title {
+                            font-size: 14px;
+                            font-weight: 700;
+                            line-height: 16px;
+                            max-height: 64px;
+                        }
+
+                        .time span{
+                            color: #00bfff;
+                        }
+
+                        .category {
+                            display: inline-block;
+                            line-height: 16px;
+                            font-size: 13px;
+                            letter-spacing: .3px;
+                        }
+
+                        .lighter {
+                            border-radius: 0 0 8px 8px;
+                        }
+
+                        ul li {
+                            margin: 4px 0;
+                        }
+
+                        .pictogram {
+                            display: inline-block;
+                            float: none;
+                        }
+
+                        .time ~ li {
+                            padding-left: 20px;
+                        }
+
+                        .error {
+                            margin: auto;
+                            /* height: 196px; */
+                            text-align: center;
+                            align-content: center;
+                            height: -webkit-fill-available;
+                            font-size: 40px;
+                            font-weight: 700;
+                        }
+
+                        .icon::before{
+                            content: " ";
+                            position: absolute;
+                            width: 166px;
+                            left: 25px;
+                            height: 166px;
+                            top: 25px;
+                            z-index: -1;
+                        }
+
+                        .tiny-icon-before::before {
+                            content: " ";
+                            position: absolute;
+                            width: 16px;
+                            height: 16px;
+                            left: 12px;
+                        }
+
+                        .icon-ban::before {
+                            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Crect width='256' height='256' fill='none'/%3E%3Ccircle cx='128' cy='128' r='96' opacity='0.2' fill='%23f0f'/%3E%3Cline x1='195.88' y1='195.88' x2='60.12' y2='60.12' fill='none' stroke='%23f0f' stroke-linecap='round' stroke-linejoin='round' stroke-width='12'/%3E%3Ccircle cx='128' cy='128' r='96' fill='none' stroke='%23f0f' stroke-miterlimit='10' stroke-width='12'/%3E%3C/svg%3E");
+                        }
+
+                        .icon-tag::before {
+                            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Crect width='256' height='256' fill='none'/%3E%3Cpath stroke='%23ffffff' fill='%23ffffff' d='M243.31,136,144,36.69A15.86,15.86,0,0,0,132.69,32H40a8,8,0,0,0-8,8v92.69A15.86,15.86,0,0,0,36.69,144L136,243.31a16,16,0,0,0,22.63,0l84.68-84.68a16,16,0,0,0,0-22.63ZM84,96A12,12,0,1,1,96,84,12,12,0,0,1,84,96Z'/%3E%3C/svg%3E");
+                        }
+
+                        .icon-eye::before {
+                            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Crect width='256' height='256' fill='none'/%3E%3Cpath stroke='%23ffffff' fill='%23ffffff' d='M247.31,124.76c-.35-.79-8.82-19.58-27.65-38.41C194.57,61.26,162.88,48,128,48S61.43,61.26,36.34,86.35C17.51,105.18,9,124,8.69,124.76a8,8,0,0,0,0,6.5c.35.79,8.82,19.57,27.65,38.4C61.43,194.74,93.12,208,128,208s66.57-13.26,91.66-38.34c18.83-18.83,27.3-37.61,27.65-38.4A8,8,0,0,0,247.31,124.76ZM128,168a40,40,0,1,1,40-40A40,40,0,0,1,128,168Z'/%3E%3C/svg%3E");
+                        }
+
+                        .icon-heart::before {
+                            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Crect width='256' height='256' fill='none'/%3E%3Cpath stroke='%23ffffff' fill='%23ffffff' d='M240,102c0,70-103.79,126.66-108.21,129a8,8,0,0,1-7.58,0C119.79,228.66,16,172,16,102A62.07,62.07,0,0,1,78,40c20.65,0,38.73,8.88,50,23.89C139.27,48.88,157.35,40,178,40A62.07,62.07,0,0,1,240,102Z'/%3E%3C/svg%3E");
+                        }
+
+                        .icon-comments::before {
+                            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Crect width='256' height='256' fill='none'/%3E%3Cpath stroke='%23ffffff' fill='%23ffffff' d='M169.57,72.59A80,80,0,0,0,16,104v64a16,16,0,0,0,16,16H86.67A80.15,80.15,0,0,0,160,232h64a16,16,0,0,0,16-16V152A80,80,0,0,0,169.57,72.59ZM224,216H160a64.14,64.14,0,0,1-55.68-32.43A79.93,79.93,0,0,0,174.7,89.71,64,64,0,0,1,224,152Z'/%3E%3C/svg%3E");
+                        }
+                    }
+
+                    &.banners {
+                        --color: maroon;
+                    }
+
+                    &.bootlegs {
+                        --color: red;
+                    }
+
+                    &.chan {
+                        --color: #f0f;
+                    }
+
+                    &.collections {
+                        --color: #ff8000;
+                    }
+
+                    &.customization {
+                        --color: #b8860b;
+                    }
+
+                    &.error {
+                        --color: #c4c;
+                        background: #c4c;
+                    }
+
+                    &.exposition {
+                        --color: #000;
+                    }
+
+                    &.figures {
+                        --color: #6b9f5b;
+                    }
+
+                    &.items {
+                        --color: #004000;
+                    }
+
+                    &.kits-customs {
+                        --color: #cc80cc;
+                    }
+
+                    &.loots-boxes {
+                        --color: #b8860b;
+                    }
+
+                    &.official {
+                        --color: gray;
+                    }
+
+                    &.spaces {
+                        --color: navy;
+                    }
+
+                    &.various {
+                        --color: purple;
+                    }
                 }
             }
 
             span {
                 font-size: 16px;
+            }
 
-                &:first-child {
-                    margin-left: 12px;
-                }
+            #loadMoreBtn {
+                margin: 0 auto 25px;
+            }
+        }
+
+
+        button {
+            font-size: 16px;
+            cursor: pointer;
+            padding: 4px 24px;
+            border: 0;
+            border-radius: 20px;
+            line-height: 32px;
+            cursor: pointer;
+            transition: opacity .2s ease;
+            font-weight: 700;
+            background-color: #555;
+            color: #eee;
+
+            &.load-custom {
+                margin: 0 0 0 auto;
             }
         }
     </style>
@@ -126,6 +328,10 @@
 <body>
     <header>
         <h1>MFC Doomscroll</h1>
+        <div class="buttons">
+            <button class="load-custom" onclick="loadCustom()">Load newest image</button>
+            <button class="load-custom" onclick="newestImage()">Load last viewable image</button>
+        </div>
     </header>
     <div class="main-container">
         <div class="input-container">
@@ -143,7 +349,7 @@
             </select>
             <button class="load-custom" onclick="loadCustom()">Load</button>
         </div>
-        <div class="image-container" id="imageContainer"></div>
+        <div class="images" id="imageContainer"></div>
         <button id="loadMoreBtn" onclick="nextPage()">Next Page</button>
     </div>
     <script>
@@ -221,15 +427,82 @@
             const id = document.getElementById('startingId').value;
             const date = document.getElementById('startingDate').value;
             if (id && date) {
-                const nextPageUrl = `/userscript-archive/index.html?id=${id}&date=${date}&per-page=${globalPerPage}`;
-                window.location.href = nextPageUrl;
+                redirect(id, date, globalPerPage);
             }
         }
 
         function nextPage() {
-            const lastImage = document.querySelector('.imageContainer:last-child');
-            const nextPageUrl = `/userscript-archive/index.html?id=${lastImage.dataset.id}&date=${lastImage.dataset.date}&per-page=${globalPerPage}`;
+            const lastImage = document.querySelector('.image-container:last-child');
+            redirect(lastImage.dataset.id, lastImage.dataset.date, globalPerPage);
+        }
+
+        async function newestImage() {
+            const url = 'https://corsproxy.io/?' + encodeURIComponent('https://myfigurecollection.net/?mode=browse&tab=overall&itemId=0&clubId=0&mySubscriptions=0&categoryId=0&sort=date&order=desc&current=tags&_tb=picture&acc=2000&page=40');
+            const convertDate = d => d.split("/").reverse().join("-");
+
+            fetch(url)
+                .then(response => response.text()) // or response.json() for JSON content
+                .then(html => {
+                    const parser = new DOMParser();
+                    const id = parser.parseFromString(html, 'text/html').querySelector('.picture-icons .picture-icon:last-child meta').content.split(':')[1];
+
+                    console.log(id);
+
+                    fetch('https://corsproxy.io/?' + encodeURIComponent('https://myfigurecollection.net/?_tb=commit'), {
+                        method: "POST",
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: `commit=loadTooltip&objectId=${id}&objectType=2`
+                    })
+                        .then(response => response.json())
+                        .then(function(j) {
+                            let container = document.createElement("div");
+                            container.innerHTML = j.htmlValues.TOOLTIP;
+                            const date = container.querySelector('.time span').title.split(', ')[0].replace('/', '-');
+                            console.log(date)
+
+                            redirect(id, convertDate(date), globalPerPage)
+                        });
+                });
+        }
+
+        function redirect(id, date, perPage) {
+            const nextPageUrl = `/userscript-archive/index.html?id=${id}&date=${date}&per-page=${perPage}`;
             window.location.href = nextPageUrl;
+        }
+
+        function applyImageCategories(id) {
+            const image = document.querySelector(`.image-container[data-id="${id}"]`);
+            fetch('https://corsproxy.io/?' + encodeURIComponent('https://myfigurecollection.net/?_tb=commit'), {
+                    method: "POST",
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: `commit=loadTooltip&objectId=${id}&objectType=2`
+                })
+                    .then(response => response.json())
+                    .then(function(j) {
+                        let container = document.createElement("div");
+                        container.classList.add('tooltip');
+                        container.innerHTML = j.htmlValues.TOOLTIP;
+                        if (!container.querySelector('.error')) {
+                            const date = decodeHTML(container.querySelector('.category')?.innerHTML);
+                            //console.log(date);
+                            image.classList.add(date.toLowerCase());
+                        }
+                        else {
+                            //console.log('error');
+                            image.classList.add('error');
+                        }
+                        image.appendChild(container);
+                    });
+        }
+
+        function decodeHTML(html) {
+            const txt = document.createElement('textarea');
+            txt.innerHTML = html;
+            return txt.value.replace('&', '-');
         }
 
         function loadImages(count = globalPerPage) {
@@ -329,7 +602,7 @@
                     globalCurrent.setDate(currentDate.getDate());
                     globalPrev.setDate(prevDate.getDate());
                     const anchor = document.createElement('a');
-                    anchor.classList.add('imageContainer');
+                    anchor.classList.add('image-container');
                     anchor.href = figureUrl;
                     anchor.target = "_blank"; // Open link in a new tab
                     anchor.appendChild(img);
@@ -343,12 +616,12 @@
                     let largestId = -1; // Start with an invalid ID
 
                     // Get all images currently in the container
-                    const existingImages = document.querySelectorAll('a.imageContainer');
+                    const existingImages = document.querySelectorAll('a.image-container');
 
                     existingImages.forEach(existingAnchor => {
                         const existingImg = existingAnchor.querySelector('img'); // Assuming each anchor contains an img
                         const existingId = parseInt(existingImg.dataset.id); // Assuming dataset id is stored here
-                        console.log(existingId)
+                        //console.log(existingId)
 
                         if (existingId < num && existingId > largestId) {
                             largestId = existingId;
@@ -365,7 +638,7 @@
                         imageContainer.appendChild(anchor);
                     }
 
-
+                    applyImageCategories(img.dataset.id);
                     console.log(globalCurrent.toDateString())
                     console.log(globalPrev.toDateString())
                     console.log(`Loaded image: ${img.src}`);
