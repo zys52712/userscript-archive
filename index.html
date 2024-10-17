@@ -133,8 +133,8 @@
             <input id="startingId" type="number" oninput="changeStartID(event)" placeholder="initial ID" value="4177191"/>
             <span>Starting Date:</span>
             <input id="startingDate" type="date" oninput="changeStartDate(event)" placeholder="initial date" value="2024-10-16"/>
-            <span for="items-per-page">Images per page:</span>
-            <select id="items-per-page" onchange="changePerPage(event)" default="100">
+            <span for="itemsPerPage">Images per page:</span>
+            <select id="itemsPerPage" onchange="changePerPage(event)" default="100">
                 <option value="50">50</option>
                 <option value="100" selected>100</option>
                 <option value="250">250</option>
@@ -174,7 +174,7 @@
         }
 
         if (perPage) {
-            document.getElementById('items-per-page').value = perPage;
+            document.getElementById('itemsPerPage').value = perPage;
             globalPerPage = perPage;
         }
 
@@ -207,7 +207,7 @@
         }
 
         function changePerPage() {
-            const dropdown = document.getElementById('items-per-page');
+            const dropdown = document.getElementById('itemsPerPage');
             globalPerPage = parseInt(dropdown.value);
             console.log(`Selected items per page: ${globalPerPage}`);
         }
@@ -218,8 +218,12 @@
         });
 
         function loadCustom() {
-            const nextPageUrl = `/userscript-archive/index.html?id=${imageId}&date=${globalCurrent.toISOString().split('T')[0]}&per-page=${globalPerPage}`;
-            window.location.href = nextPageUrl;
+            const id = document.getElementById('startingId').value;
+            const date = document.getElementById('startingDate').value;
+            if (id && date) {
+                const nextPageUrl = `/userscript-archive/index.html?id=${id}&date=${date}&per-page=${globalPerPage}`;
+                window.location.href = nextPageUrl;
+            }
         }
 
         function nextPage() {
