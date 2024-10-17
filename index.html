@@ -163,13 +163,13 @@
         });
 
         function loadCustom() {
-            const nextPageUrl = `?id=${imageId}&date=${globalCurrent.toISOString().split('T')[0]}`;
+            const nextPageUrl = `/userscript-archive/?id=${imageId}&date=${globalCurrent.toISOString().split('T')[0]}`;
             window.location.href = nextPageUrl;
         }
 
         function nextPage() {
             const lastImage = document.querySelector('.imageContainer:last-child');
-            const nextPageUrl = `?id=${lastImage.dataset.id}&date=${lastImage.dataset.date}`;
+            const nextPageUrl = `/userscript-archive/?id=${lastImage.dataset.id}&date=${lastImage.dataset.date}`;
             window.location.href = nextPageUrl;
         }
 
