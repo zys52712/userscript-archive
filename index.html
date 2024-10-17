@@ -48,12 +48,38 @@
                     color: white;
                     color-scheme: dark;
                     font-size: 18px;
+                    width: 16ch;
+                    margin-right: 16px;
 
                     &:focus-visible {
                         outline: none;
                     }
                 }
             }
+
+            select {
+                background-color: #222222;
+                color: #ffffff;
+                border: 1px solid #444444;
+                border-radius: 4px;
+                padding: 10px;
+                font-size: 16px;
+                cursor: pointer;
+
+                option {
+                    background-color: #222222;
+                    color: #ffffff;
+                }
+
+                &:hover {
+                    border-color: #888888;
+                }
+
+                &:focus-visible {
+                    outline: none;
+                }
+            }
+
             .image-container {
                 display: flex;
                 flex-wrap: wrap;
@@ -89,10 +115,9 @@
 
             span {
                 font-size: 16px;
-                line-height: 16px;
 
                 &:first-child {
-                    margin-left: 6px;
+                    margin-left: 12px;
                 }
             }
         }
@@ -108,21 +133,31 @@
             <input id="startingId" type="number" oninput="changeStartID(event)" placeholder="initial ID" value="4177191"/>
             <span>Starting Date:</span>
             <input id="startingDate" type="date" oninput="changeStartDate(event)" placeholder="initial date" value="2024-10-16"/>
+            <span for="items-per-page">Images per page:</span>
+            <select id="items-per-page" onchange="changePerPage(event)" default="100">
+                <option value="50">50</option>
+                <option value="100" selected>100</option>
+                <option value="250">250</option>
+                <option value="500">500</option>
+                <option value="1000">1000</option>
+            </select>
             <button class="load-custom" onclick="loadCustom()">Load</button>
         </div>
         <div class="image-container" id="imageContainer"></div>
-        <button id="loadMoreBtn" onclick="nextPage()">Load 100 Images</button>
+        <button id="loadMoreBtn" onclick="nextPage()">Next Page</button>
     </div>
     <script>
         let imageId = 4177191;  // Starting point
         let globalCurrent = new Date(2024, 9, 16);  // Start date: 2024-10-16 (months are zero-indexed)
         let globalPrev = new Date(2024, 9, 15);
+        let globalPerPage = 100;
 
         const url = new URL(window.location.href);
         const params = new URLSearchParams(url.search);
 
         const id = params.get('id');
         const date = params.get('date');
+        const perPage = params.get('per-page');
 
         if (id && date) {
             imageId = id;
@@ -136,6 +171,11 @@
 
             console.log(globalCurrent.toDateString())
             console.log(globalPrev.toDateString())
+        }
+
+        if (perPage) {
+            document.getElementById('items-per-page').value = perPage;
+            globalPerPage = perPage;
         }
 
         const baseUrl = "https://static.myfigurecollection.net/upload/pictures/";
@@ -157,22 +197,6 @@
             console.log(imageId)
         }
 
-        // Load another 100 images on button click
-        loadMoreBtn.addEventListener('click', function() {
-            //loadImages(100);
-        });
-
-        function loadCustom() {
-            const nextPageUrl = `/userscript-archive/?id=${imageId}&date=${globalCurrent.toISOString().split('T')[0]}`;
-            window.location.href = nextPageUrl;
-        }
-
-        function nextPage() {
-            const lastImage = document.querySelector('.imageContainer:last-child');
-            const nextPageUrl = `/userscript-archive/?id=${lastImage.dataset.id}&date=${lastImage.dataset.date}`;
-            window.location.href = nextPageUrl;
-        }
-
         function changeStartDate(event) {
             let selectedDate = event.target.value.split('-');
             globalCurrent = new Date(selectedDate[0], selectedDate[1] - 1, selectedDate[2]);
@@ -182,7 +206,29 @@
             console.log(globalPrev.toDateString())
         }
 
-        function loadImages(count = 100) {
+        function changePerPage() {
+            const dropdown = document.getElementById('items-per-page');
+            globalPerPage = parseInt(dropdown.value);
+            console.log(`Selected items per page: ${globalPerPage}`);
+        }
+
+        // Load another 100 images on button click
+        loadMoreBtn.addEventListener('click', function() {
+            //loadImages(100);
+        });
+
+        function loadCustom() {
+            const nextPageUrl = `/userscript-archive/index.html?id=${imageId}&date=${globalCurrent.toISOString().split('T')[0]}&per-page=${globalPerPage}`;
+            window.location.href = nextPageUrl;
+        }
+
+        function nextPage() {
+            const lastImage = document.querySelector('.imageContainer:last-child');
+            const nextPageUrl = `/userscript-archive/index.html?id=${lastImage.dataset.id}&date=${lastImage.dataset.date}&per-page=${globalPerPage}`;
+            window.location.href = nextPageUrl;
+        }
+
+        function loadImages(count = globalPerPage) {
             let successCount = 0;
             const maxImages = count;
 
