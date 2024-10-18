@@ -1,462 +1,557 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MFC Doomscroll</title>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>MFC Doomscroll</title>
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #2a2a2a;
-            color: #DDDDDD;
-            margin: 0;
-        }
-        header {
-            background: #222222;
-            padding: 25px 40px;
-            box-shadow: 0 2px 2px rgba(0, 0, 0, .1);
-            display: flex;
-            place-content: space-between;
-
-            h1 {
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                background: #2a2a2a;
+                color: #DDDDDD;
                 margin: 0;
+                --box-shadow: 2px 2px 2px rgba(0, 0, 0, .2);
             }
 
-            .buttons {
+            header {
+                background: #222222;
+                padding: 25px 40px;
+                box-shadow: var(--box-shadow);
                 display: flex;
+                place-content: space-between;
+
+                h1 {
+                    margin: 0;
+                }
+
+                .buttons {
+                    display: flex;
+                    gap: 20px;
+                }
+            }
+
+            main {
+                display: flex;
+                margin: 30px auto;
+                border-radius: 43px;
+                position: relative;
+                justify-content: center;
+                width: fit-content;
+                background: #222222;
+                box-shadow: var(--box-shadow);
+
+                &.image-open {
+                    .main-container {
+                        max-width: calc(100vw - 60px - 660px);
+
+                        .images {
+                            max-width: calc(100vw - 60px - 660px);
+                        }
+                    }
+
+                    .view-container {
+                        max-width: 640px;
+                    }
+                }
+            }
+
+            .view-container {
+                height: fit-content;
+                max-width: 0;
+                overflow: hidden;
+                transition: max-width 0.5s;
+                z-index: 1;
+                position: sticky;
+                top: 30px;
+
+                .view-inner {
+                    width: 600px;
+                    padding: 16px 20px;
+                    position: relative;
+                }
+
+                .close {
+                    cursor: pointer;
+                    width: 32px;
+                    height: 32px;
+                    padding: 8px;
+                    background: #dddddd;
+                    border-radius: 30px;
+                    position: absolute;
+                    top: 20px;
+                    right: 20px;
+                    box-shadow: var(--box-shadow);
+                }
+
+                .main-image-container {
+                    max-width: 600px;
+
+                    .main-image {
+                        max-width: -webkit-fill-available;
+                        max-height: calc(100vh - 160px);
+                        object-fit: contain;
+                    }
+
+                    img {
+                        width: 600px;
+                    }
+                }
+            }
+
+            .main-container {
+                padding: 8px;
+                width: 1440px;
+                max-width: 1440px;
+                display: grid;
                 gap: 20px;
-            }
-        }
-        .main-container {
-            margin: 30px auto !important;
-            padding: 8px;
-            width: 1600px;
-            margin: auto;
-            background: #222222;
-            display: grid;
-            gap: 20px;
+                transition: max-width 0.5s;
 
-            .input-container {
-                background-color: #272727;
-                padding: 15px;
-                margin: 8px;
 
-                display: flex;
-                flex-direction: row;
-                flex-wrap: nowrap;
-                align-items: center;
-                border-radius: 50px;
-                gap: 10px;
+                .input-container {
+                    background-color: #272727;
+                    padding: 15px;
+                    margin: 8px;
 
-                input {
-                    background: none;
-                    border: none;
-                    color: white;
-                    color-scheme: dark;
-                    font-size: 18px;
-                    width: 16ch;
-                    margin-right: 16px;
+                    display: flex;
+                    flex-direction: row;
+                    flex-wrap: nowrap;
+                    align-items: center;
+                    border-radius: 50px;
+                    gap: 10px;
+
+                    input {
+                        background: none;
+                        border: none;
+                        color: white;
+                        color-scheme: dark;
+                        font-size: 18px;
+                        width: 14ch;
+                        margin-right: 16px;
+
+                        &:focus-visible {
+                            outline: none;
+                        }
+                    }
+
+                    #startingId {
+                        width: 10ch;
+                    }
+
+                    span:first-child {
+                        margin-left: 12px;
+                    }
+                }
+
+                select {
+                    background-color: #222222;
+                    color: #ffffff;
+                    border: 1px solid #444444;
+                    border-radius: 4px;
+                    padding: 10px;
+                    font-size: 16px;
+                    cursor: pointer;
+
+                    option {
+                        background-color: #222222;
+                        color: #ffffff;
+                    }
+
+                    &:hover {
+                        border-color: #888888;
+                    }
 
                     &:focus-visible {
                         outline: none;
                     }
                 }
 
-                span:first-child {
-                    margin-left: 12px;
+                .images {
+                    width: 1440px;
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 24px;
+                    justify-content: center;
+
+                    img {
+                        height: 196px;
+                        object-fit: contain;
+                        max-width: 512px;
+                    }
+
+                    .image-container {
+                        padding: 6px;
+                        border: 2px solid var(--color);
+                        display: flex;
+                        --color: chartreuse;
+                        position: relative;
+
+                        &:hover .tooltip {
+                            opacity: 1;
+                            transform: translate(-50%, calc(-100% - 16px));
+                        }
+
+                        .tooltip {
+                            padding: 12px;
+                            position: absolute;
+                            left: 50%;
+                            transform: translate(-50%, -100%);
+                            background: rgba(33, 33, 33, .6);
+                            opacity: 0;
+
+                            position: absolute;
+                            width: 192px;
+                            z-index: 20;
+                            border-radius: 8px;
+                            white-space: normal;
+                            box-shadow: 0 0 10px rgba(0, 0, 0, .4);
+                            backdrop-filter: blur(6px);
+                            pointer-events: none;
+                            transition: opacity 0.3s, transform 0.3s;
+
+                            &:has(.error) {
+                                height: 192px;
+                            }
+
+                            ul {
+                                margin: 0;
+                                padding: 0;
+                                list-style: none;
+                            }
+
+                            * {
+                                color: white;
+                            }
+
+                            .title,
+                            ul li {
+                                overflow: hidden;
+                                text-overflow: ellipsis;
+                            }
+
+                            .title {
+                                font-size: 14px;
+                                font-weight: 700;
+                                line-height: 16px;
+                                max-height: 64px;
+                            }
+
+                            .time span {
+                                color: #00bfff;
+                            }
+
+                            .category {
+                                display: inline-block;
+                                line-height: 16px;
+                                font-size: 13px;
+                                letter-spacing: .3px;
+                            }
+
+                            .lighter {
+                                border-radius: 0 0 8px 8px;
+                            }
+
+                            ul li {
+                                margin: 4px 0;
+                            }
+
+                            .pictogram {
+                                display: inline-block;
+                                float: none;
+                            }
+
+                            .time ~ li {
+                                padding-left: 20px;
+                            }
+
+                            .error {
+                                margin: auto;
+                                /* height: 196px; */
+                                text-align: center;
+                                align-content: center;
+                                height: -webkit-fill-available;
+                                font-size: 40px;
+                                font-weight: 700;
+                            }
+
+                            .icon::before {
+                                content: " ";
+                                position: absolute;
+                                width: 166px;
+                                left: 25px;
+                                height: 166px;
+                                top: 25px;
+                                z-index: -1;
+                            }
+
+                            .tiny-icon-before::before {
+                                content: " ";
+                                position: absolute;
+                                width: 16px;
+                                height: 16px;
+                                left: 12px;
+                            }
+
+                            .icon-ban::before {
+                                background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Crect width='256' height='256' fill='none'/%3E%3Ccircle cx='128' cy='128' r='96' opacity='0.2' fill='%23f0f'/%3E%3Cline x1='195.88' y1='195.88' x2='60.12' y2='60.12' fill='none' stroke='%23f0f' stroke-linecap='round' stroke-linejoin='round' stroke-width='12'/%3E%3Ccircle cx='128' cy='128' r='96' fill='none' stroke='%23f0f' stroke-miterlimit='10' stroke-width='12'/%3E%3C/svg%3E");
+                            }
+
+                            .icon-tag::before {
+                                background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Crect width='256' height='256' fill='none'/%3E%3Cpath stroke='%23ffffff' fill='%23ffffff' d='M243.31,136,144,36.69A15.86,15.86,0,0,0,132.69,32H40a8,8,0,0,0-8,8v92.69A15.86,15.86,0,0,0,36.69,144L136,243.31a16,16,0,0,0,22.63,0l84.68-84.68a16,16,0,0,0,0-22.63ZM84,96A12,12,0,1,1,96,84,12,12,0,0,1,84,96Z'/%3E%3C/svg%3E");
+                            }
+
+                            .icon-eye::before {
+                                background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Crect width='256' height='256' fill='none'/%3E%3Cpath stroke='%23ffffff' fill='%23ffffff' d='M247.31,124.76c-.35-.79-8.82-19.58-27.65-38.41C194.57,61.26,162.88,48,128,48S61.43,61.26,36.34,86.35C17.51,105.18,9,124,8.69,124.76a8,8,0,0,0,0,6.5c.35.79,8.82,19.57,27.65,38.4C61.43,194.74,93.12,208,128,208s66.57-13.26,91.66-38.34c18.83-18.83,27.3-37.61,27.65-38.4A8,8,0,0,0,247.31,124.76ZM128,168a40,40,0,1,1,40-40A40,40,0,0,1,128,168Z'/%3E%3C/svg%3E");
+                            }
+
+                            .icon-heart::before {
+                                background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Crect width='256' height='256' fill='none'/%3E%3Cpath stroke='%23ffffff' fill='%23ffffff' d='M240,102c0,70-103.79,126.66-108.21,129a8,8,0,0,1-7.58,0C119.79,228.66,16,172,16,102A62.07,62.07,0,0,1,78,40c20.65,0,38.73,8.88,50,23.89C139.27,48.88,157.35,40,178,40A62.07,62.07,0,0,1,240,102Z'/%3E%3C/svg%3E");
+                            }
+
+                            .icon-comments::before {
+                                background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Crect width='256' height='256' fill='none'/%3E%3Cpath stroke='%23ffffff' fill='%23ffffff' d='M169.57,72.59A80,80,0,0,0,16,104v64a16,16,0,0,0,16,16H86.67A80.15,80.15,0,0,0,160,232h64a16,16,0,0,0,16-16V152A80,80,0,0,0,169.57,72.59ZM224,216H160a64.14,64.14,0,0,1-55.68-32.43A79.93,79.93,0,0,0,174.7,89.71,64,64,0,0,1,224,152Z'/%3E%3C/svg%3E");
+                            }
+                        }
+
+                        &.banners {
+                            --color: maroon;
+                        }
+
+                        &.bootlegs {
+                            --color: red;
+                        }
+
+                        &.chan {
+                            --color: #f0f;
+                        }
+
+                        &.collections {
+                            --color: #ff8000;
+                        }
+
+                        &.customization {
+                            --color: #b8860b;
+                        }
+
+                        &.error {
+                            --color: #c4c;
+                            background: #c4c;
+                        }
+
+                        &.exposition {
+                            --color: #000;
+                        }
+
+                        &.figures {
+                            --color: #6b9f5b;
+                        }
+
+                        &.items {
+                            --color: #004000;
+                        }
+
+                        &.kits-customs {
+                            --color: #cc80cc;
+                        }
+
+                        &.loots-boxes {
+                            --color: #b8860b;
+                        }
+
+                        &.official {
+                            --color: gray;
+                        }
+
+                        &.spaces {
+                            --color: navy;
+                        }
+
+                        &.various {
+                            --color: purple;
+                        }
+                    }
+                }
+
+                span {
+                    font-size: 16px;
+                }
+
+                #loadMoreBtn {
+                    margin: 0 auto 25px;
                 }
             }
 
-            select {
-                background-color: #222222;
-                color: #ffffff;
-                border: 1px solid #444444;
-                border-radius: 4px;
-                padding: 10px;
+
+            button {
                 font-size: 16px;
                 cursor: pointer;
+                padding: 4px 24px;
+                border: 0;
+                border-radius: 20px;
+                line-height: 32px;
+                cursor: pointer;
+                transition: opacity .2s ease;
+                font-weight: 700;
+                background-color: #555;
+                color: #eee;
 
-                option {
-                    background-color: #222222;
-                    color: #ffffff;
-                }
-
-                &:hover {
-                    border-color: #888888;
-                }
-
-                &:focus-visible {
-                    outline: none;
-                }
-            }
-
-            .images {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 24px;
-                justify-content: center;
-
-                img {
-                    height: 196px;
-                    object-fit: contain;
-                    max-width: 512px;
-                }
-
-                .image-container {
-                    padding: 6px;
-                    border: 2px solid var(--color);
-                    display: flex;
-                    --color: chartreuse;
-                    position: relative;
-
-                    &:hover .tooltip{
-                        opacity: 1;
-                        transform: translate(-50%, calc(-100% - 16px));
-                    }
-
-                    .tooltip {
-                        padding: 12px;
-                        position: absolute;
-                        left: 50%;
-                        transform: translate(-50%, -100%);
-                        background: rgba(33, 33, 33, .6);
-                        opacity: 0;
-
-                        position: absolute;
-                        width: 192px;
-                        z-index: 20;
-                        border-radius: 8px;
-                        white-space: normal;
-                        box-shadow: 0 0 10px rgba(0, 0, 0, .4);
-                        backdrop-filter: blur(6px);
-                        pointer-events: none;
-                        transition: opacity 0.3s, transform 0.3s;
-
-                        &:has(.error) {
-                            height: 192px;
-                        }
-
-                        ul {
-                            margin: 0;
-                            padding: 0;
-                            list-style: none;
-                        }
-
-                        * {
-                            color: white;
-                        }
-
-                        .title,
-                        ul li {
-                            overflow: hidden;
-                            text-overflow: ellipsis;
-                        }
-
-                        .title {
-                            font-size: 14px;
-                            font-weight: 700;
-                            line-height: 16px;
-                            max-height: 64px;
-                        }
-
-                        .time span{
-                            color: #00bfff;
-                        }
-
-                        .category {
-                            display: inline-block;
-                            line-height: 16px;
-                            font-size: 13px;
-                            letter-spacing: .3px;
-                        }
-
-                        .lighter {
-                            border-radius: 0 0 8px 8px;
-                        }
-
-                        ul li {
-                            margin: 4px 0;
-                        }
-
-                        .pictogram {
-                            display: inline-block;
-                            float: none;
-                        }
-
-                        .time ~ li {
-                            padding-left: 20px;
-                        }
-
-                        .error {
-                            margin: auto;
-                            /* height: 196px; */
-                            text-align: center;
-                            align-content: center;
-                            height: -webkit-fill-available;
-                            font-size: 40px;
-                            font-weight: 700;
-                        }
-
-                        .icon::before{
-                            content: " ";
-                            position: absolute;
-                            width: 166px;
-                            left: 25px;
-                            height: 166px;
-                            top: 25px;
-                            z-index: -1;
-                        }
-
-                        .tiny-icon-before::before {
-                            content: " ";
-                            position: absolute;
-                            width: 16px;
-                            height: 16px;
-                            left: 12px;
-                        }
-
-                        .icon-ban::before {
-                            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Crect width='256' height='256' fill='none'/%3E%3Ccircle cx='128' cy='128' r='96' opacity='0.2' fill='%23f0f'/%3E%3Cline x1='195.88' y1='195.88' x2='60.12' y2='60.12' fill='none' stroke='%23f0f' stroke-linecap='round' stroke-linejoin='round' stroke-width='12'/%3E%3Ccircle cx='128' cy='128' r='96' fill='none' stroke='%23f0f' stroke-miterlimit='10' stroke-width='12'/%3E%3C/svg%3E");
-                        }
-
-                        .icon-tag::before {
-                            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Crect width='256' height='256' fill='none'/%3E%3Cpath stroke='%23ffffff' fill='%23ffffff' d='M243.31,136,144,36.69A15.86,15.86,0,0,0,132.69,32H40a8,8,0,0,0-8,8v92.69A15.86,15.86,0,0,0,36.69,144L136,243.31a16,16,0,0,0,22.63,0l84.68-84.68a16,16,0,0,0,0-22.63ZM84,96A12,12,0,1,1,96,84,12,12,0,0,1,84,96Z'/%3E%3C/svg%3E");
-                        }
-
-                        .icon-eye::before {
-                            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Crect width='256' height='256' fill='none'/%3E%3Cpath stroke='%23ffffff' fill='%23ffffff' d='M247.31,124.76c-.35-.79-8.82-19.58-27.65-38.41C194.57,61.26,162.88,48,128,48S61.43,61.26,36.34,86.35C17.51,105.18,9,124,8.69,124.76a8,8,0,0,0,0,6.5c.35.79,8.82,19.57,27.65,38.4C61.43,194.74,93.12,208,128,208s66.57-13.26,91.66-38.34c18.83-18.83,27.3-37.61,27.65-38.4A8,8,0,0,0,247.31,124.76ZM128,168a40,40,0,1,1,40-40A40,40,0,0,1,128,168Z'/%3E%3C/svg%3E");
-                        }
-
-                        .icon-heart::before {
-                            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Crect width='256' height='256' fill='none'/%3E%3Cpath stroke='%23ffffff' fill='%23ffffff' d='M240,102c0,70-103.79,126.66-108.21,129a8,8,0,0,1-7.58,0C119.79,228.66,16,172,16,102A62.07,62.07,0,0,1,78,40c20.65,0,38.73,8.88,50,23.89C139.27,48.88,157.35,40,178,40A62.07,62.07,0,0,1,240,102Z'/%3E%3C/svg%3E");
-                        }
-
-                        .icon-comments::before {
-                            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Crect width='256' height='256' fill='none'/%3E%3Cpath stroke='%23ffffff' fill='%23ffffff' d='M169.57,72.59A80,80,0,0,0,16,104v64a16,16,0,0,0,16,16H86.67A80.15,80.15,0,0,0,160,232h64a16,16,0,0,0,16-16V152A80,80,0,0,0,169.57,72.59ZM224,216H160a64.14,64.14,0,0,1-55.68-32.43A79.93,79.93,0,0,0,174.7,89.71,64,64,0,0,1,224,152Z'/%3E%3C/svg%3E");
-                        }
-                    }
-
-                    &.banners {
-                        --color: maroon;
-                    }
-
-                    &.bootlegs {
-                        --color: red;
-                    }
-
-                    &.chan {
-                        --color: #f0f;
-                    }
-
-                    &.collections {
-                        --color: #ff8000;
-                    }
-
-                    &.customization {
-                        --color: #b8860b;
-                    }
-
-                    &.error {
-                        --color: #c4c;
-                        background: #c4c;
-                    }
-
-                    &.exposition {
-                        --color: #000;
-                    }
-
-                    &.figures {
-                        --color: #6b9f5b;
-                    }
-
-                    &.items {
-                        --color: #004000;
-                    }
-
-                    &.kits-customs {
-                        --color: #cc80cc;
-                    }
-
-                    &.loots-boxes {
-                        --color: #b8860b;
-                    }
-
-                    &.official {
-                        --color: gray;
-                    }
-
-                    &.spaces {
-                        --color: navy;
-                    }
-
-                    &.various {
-                        --color: purple;
-                    }
+                &.load-custom {
+                    margin: 0 0 0 auto;
                 }
             }
+        </style>
+    </head>
+    <body>
+        <header>
+            <h1>MFC Doomscroll</h1>
+            <div class="buttons">
+                <button class="load-custom" onclick="newestImage()">Load newest image</button>
+                <button class="load-custom" onclick="lastViewableImage()">Load last viewable image</button>
+            </div>
+        </header>
+        <main>
+            <div class="main-container">
+                <div class="input-container">
+                    <span>Starting ID:</span>
+                    <input id="startingId" type="number" oninput="changeStartID(event)" placeholder="initial ID" value="4177191"/>
+                    <span>Starting Date:</span>
+                    <input id="startingDate" type="date" oninput="changeStartDate(event)" placeholder="initial date" value="2024-10-16"/>
+                    <span for="itemsPerPage">Images per page:</span>
+                    <select id="itemsPerPage" onchange="changePerPage(event)" default="100">
+                        <option value="50">50</option>
+                        <option value="100" selected>100</option>
+                        <option value="250">250</option>
+                        <option value="500">500</option>
+                        <option value="1000">1000</option>
+                    </select>
+                    <button class="load-custom" onclick="loadCustom()">Load</button>
+                </div>
+                <div class="images" id="imageContainer"></div>
+                <button id="loadMoreBtn" onclick="nextPage()">Next Page</button>
+            </div>
+            <div class="view-container">
+                <div class="view-inner">
+                    <div class="close" onclick="closeImage()">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+                            <rect width="256" height="256" fill="none"/>
+                            <line x1="200" y1="56" x2="56" y2="200" stroke="#2a2a2a" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/>
+                            <line x1="200" y1="200" x2="56" y2="56" stroke="#2a2a2a" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/>
+                        </svg>
+                    </div>
+                    <h1 class="image-title">Image Name</h1>
+                    <a class="main-image-container" target="_blank">
+                        <img class="main-image">
+                    </a>
+                </div>
+            </div>
+        </main>
+        <footer></footer>
+        <script>
+            let imageId = 4177191; // Starting point
+            let globalCurrent = new Date(2024, 9, 16); // Start date: 2024-10-16 (months are zero-indexed)
+            let globalPrev = new Date(2024, 9, 15);
+            let globalPerPage = 100;
 
-            span {
-                font-size: 16px;
-            }
+            const url = new URL(window.location.href);
+            const params = new URLSearchParams(url.search);
 
-            #loadMoreBtn {
-                margin: 0 auto 25px;
-            }
-        }
+            const id = params.get('id');
+            const date = params.get('date');
+            const perPage = params.get('per-page');
 
-
-        button {
-            font-size: 16px;
-            cursor: pointer;
-            padding: 4px 24px;
-            border: 0;
-            border-radius: 20px;
-            line-height: 32px;
-            cursor: pointer;
-            transition: opacity .2s ease;
-            font-weight: 700;
-            background-color: #555;
-            color: #eee;
-
-            &.load-custom {
-                margin: 0 0 0 auto;
-            }
-        }
-    </style>
-</head>
-<body>
-    <header>
-        <h1>MFC Doomscroll</h1>
-        <div class="buttons">
-            <button class="load-custom" onclick="loadCustom()">Load newest image</button>
-            <button class="load-custom" onclick="newestImage()">Load last viewable image</button>
-        </div>
-    </header>
-    <div class="main-container">
-        <div class="input-container">
-            <span>Starting ID:</span>
-            <input id="startingId" type="number" oninput="changeStartID(event)" placeholder="initial ID" value="4177191"/>
-            <span>Starting Date:</span>
-            <input id="startingDate" type="date" oninput="changeStartDate(event)" placeholder="initial date" value="2024-10-16"/>
-            <span for="itemsPerPage">Images per page:</span>
-            <select id="itemsPerPage" onchange="changePerPage(event)" default="100">
-                <option value="50">50</option>
-                <option value="100" selected>100</option>
-                <option value="250">250</option>
-                <option value="500">500</option>
-                <option value="1000">1000</option>
-            </select>
-            <button class="load-custom" onclick="loadCustom()">Load</button>
-        </div>
-        <div class="images" id="imageContainer"></div>
-        <button id="loadMoreBtn" onclick="nextPage()">Next Page</button>
-    </div>
-    <script>
-        let imageId = 4177191;  // Starting point
-        let globalCurrent = new Date(2024, 9, 16);  // Start date: 2024-10-16 (months are zero-indexed)
-        let globalPrev = new Date(2024, 9, 15);
-        let globalPerPage = 100;
-
-        const url = new URL(window.location.href);
-        const params = new URLSearchParams(url.search);
-
-        const id = params.get('id');
-        const date = params.get('date');
-        const perPage = params.get('per-page');
-
-        if (id && date) {
-            imageId = id;
-            let selectedDate = date.split('-');
-            globalCurrent = new Date(selectedDate[0], selectedDate[1] - 1, selectedDate[2]);
-            globalPrev = new Date(globalCurrent);
-            globalPrev.setDate(globalPrev.getDate() - 1);
-
-            document.getElementById('startingId').value = id;
-            document.getElementById('startingDate').value = date;
-
-            console.log(globalCurrent.toDateString())
-            console.log(globalPrev.toDateString())
-        }
-
-        if (perPage) {
-            document.getElementById('itemsPerPage').value = perPage;
-            globalPerPage = perPage;
-        }
-
-        const baseUrl = "https://static.myfigurecollection.net/upload/pictures/";
-        const imageContainer = document.getElementById('imageContainer');
-        const loadMoreBtn = document.getElementById('loadMoreBtn');
-
-        async function fetchImagePage(id) {
-            const mainImageUrl = `https://myfigurecollection.net/picture/${id}`;
-            let response = await fetch(mainImageUrl);
-            return !!response.ok;
-        }
-
-        function getUrl(date, id, extension) {
-            return `${baseUrl}${date}/thumbnails/${imageId}.${extension}`;
-        }
-
-        function changeStartID(event) {
-            imageId = event.target.value;
-            console.log(imageId)
-        }
-
-        function changeStartDate(event) {
-            let selectedDate = event.target.value.split('-');
-            globalCurrent = new Date(selectedDate[0], selectedDate[1] - 1, selectedDate[2]);
-            globalPrev = new Date(globalCurrent);
-            globalPrev.setDate(globalPrev.getDate() - 1);
-            console.log(globalCurrent.toDateString())
-            console.log(globalPrev.toDateString())
-        }
-
-        function changePerPage() {
-            const dropdown = document.getElementById('itemsPerPage');
-            globalPerPage = parseInt(dropdown.value);
-            console.log(`Selected items per page: ${globalPerPage}`);
-        }
-
-        // Load another 100 images on button click
-        loadMoreBtn.addEventListener('click', function() {
-            //loadImages(100);
-        });
-
-        function loadCustom() {
-            const id = document.getElementById('startingId').value;
-            const date = document.getElementById('startingDate').value;
             if (id && date) {
-                redirect(id, date, globalPerPage);
+                imageId = id;
+                let selectedDate = date.split('-');
+                globalCurrent = new Date(selectedDate[0], selectedDate[1] - 1, selectedDate[2]);
+                globalPrev = new Date(globalCurrent);
+                globalPrev.setDate(globalPrev.getDate() - 1);
+
+                document.getElementById('startingId').value = id;
+                document.getElementById('startingDate').value = date;
+
+                console.log(globalCurrent.toDateString())
+                console.log(globalPrev.toDateString())
             }
-        }
 
-        function nextPage() {
-            const lastImage = document.querySelector('.image-container:last-child');
-            redirect(lastImage.dataset.id, lastImage.dataset.date, globalPerPage);
-        }
+            if (perPage) {
+                document.getElementById('itemsPerPage').value = perPage;
+                globalPerPage = perPage;
+            }
 
-        async function newestImage() {
-            const url = 'https://corsproxy.io/?' + encodeURIComponent('https://myfigurecollection.net/?mode=browse&tab=overall&itemId=0&clubId=0&mySubscriptions=0&categoryId=0&sort=date&order=desc&current=tags&_tb=picture&acc=2000&page=40');
-            const convertDate = d => d.split("/").reverse().join("-");
+            const baseUrl = "https://static.myfigurecollection.net/upload/pictures/";
+            const imageContainer = document.getElementById('imageContainer');
+            const loadMoreBtn = document.getElementById('loadMoreBtn');
 
-            fetch(url)
-                .then(response => response.text()) // or response.json() for JSON content
+            async function fetchImagePage(id) {
+                const mainImageUrl = `https://myfigurecollection.net/picture/${id}`;
+                let response = await fetch(mainImageUrl);
+                return !!response.ok;
+            }
+
+            function getUrl(date, id, extension) {
+                return `${baseUrl}${date}/thumbnails/${imageId}.${extension}`;
+            }
+
+            function changeStartID(event) {
+                imageId = event.target.value;
+                console.log(imageId)
+            }
+
+            function changeStartDate(event) {
+                let selectedDate = event.target.value.split('-');
+                globalCurrent = new Date(selectedDate[0], selectedDate[1] - 1, selectedDate[2]);
+                globalPrev = new Date(globalCurrent);
+                globalPrev.setDate(globalPrev.getDate() - 1);
+                console.log(globalCurrent.toDateString())
+                console.log(globalPrev.toDateString())
+            }
+
+            function changePerPage() {
+                const dropdown = document.getElementById('itemsPerPage');
+                globalPerPage = parseInt(dropdown.value);
+                console.log(`Selected items per page: ${globalPerPage}`);
+            }
+
+            // Load another 100 images on button click
+            loadMoreBtn.addEventListener('click', function () {
+
+                //loadImages(100);
+            });
+
+            function loadCustom() {
+                const id = document.getElementById('startingId').value;
+                const date = document.getElementById('startingDate').value;
+                if (id && date) {
+                    redirect(id, date, globalPerPage);
+                }
+            }
+
+            function nextPage() {
+                const lastImage = document.querySelector('.image-container:last-child');
+                redirect(lastImage.dataset.id, lastImage.dataset.date, globalPerPage);
+            }
+
+            function newestImage() {
+                const url = 'https://corsproxy.io/?' + encodeURIComponent('https://myfigurecollection.net/picture/');
+                const convertDate = d => d.split("/").reverse().join("-");
+
+                fetch(url)
+                    .then(response => response.text()) // or response.json() for JSON content
                 .then(html => {
                     const parser = new DOMParser();
-                    const id = parser.parseFromString(html, 'text/html').querySelector('.picture-icons .picture-icon:last-child meta').content.split(':')[1];
+                    const id = parser.parseFromString(html, 'text/html').querySelector('.picture-icons .picture-icon:first-child meta').content.split(':')[1];
 
                     console.log(id);
 
                     fetch('https://corsproxy.io/?' + encodeURIComponent('https://myfigurecollection.net/?_tb=commit'), {
-                        method: "POST",
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded'
-                        },
-                        body: `commit=loadTooltip&objectId=${id}&objectType=2`
-                    })
+                            method: "POST",
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded'
+                            },
+                            body: `commit=loadTooltip&objectId=${id}&objectType=2`
+                        })
                         .then(response => response.json())
-                        .then(function(j) {
+                        .then(function (j) {
                             let container = document.createElement("div");
                             container.innerHTML = j.htmlValues.TOOLTIP;
                             const date = container.querySelector('.time span').title.split(', ')[0].replace('/', '-');
@@ -465,24 +560,55 @@
                             redirect(id, convertDate(date), globalPerPage)
                         });
                 });
-        }
+            }
 
-        function redirect(id, date, perPage) {
-            const nextPageUrl = `/userscript-archive/index.html?id=${id}&date=${date}&per-page=${perPage}`;
-            window.location.href = nextPageUrl;
-        }
+            function lastViewableImage() {
+                const url = 'https://corsproxy.io/?' + encodeURIComponent('https://myfigurecollection.net/?mode=browse&tab=overall&itemId=0&clubId=0&mySubscriptions=0&categoryId=0&sort=date&order=desc&current=tags&_tb=picture&acc=2000&page=40');
+                const convertDate = d => d.split("/").reverse().join("-");
 
-        function applyImageCategories(id) {
-            const image = document.querySelector(`.image-container[data-id="${id}"]`);
-            fetch('https://corsproxy.io/?' + encodeURIComponent('https://myfigurecollection.net/?_tb=commit'), {
-                    method: "POST",
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    body: `commit=loadTooltip&objectId=${id}&objectType=2`
-                })
+                fetch(url)
+                    .then(response => response.text()) // or response.json() for JSON content
+                .then(html => {
+                    const parser = new DOMParser();
+                    const id = parser.parseFromString(html, 'text/html').querySelector('.picture-icons .picture-icon:last-child meta').content.split(':')[1];
+
+                    console.log(id);
+
+                    fetch('https://corsproxy.io/?' + encodeURIComponent('https://myfigurecollection.net/?_tb=commit'), {
+                            method: "POST",
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded'
+                            },
+                            body: `commit=loadTooltip&objectId=${id}&objectType=2`
+                        })
+                        .then(response => response.json())
+                        .then(function (j) {
+                            let container = document.createElement("div");
+                            container.innerHTML = j.htmlValues.TOOLTIP;
+                            const date = container.querySelector('.time span').title.split(', ')[0].replace('/', '-');
+                            console.log(date)
+
+                            redirect(id, convertDate(date), globalPerPage)
+                        });
+                });
+            }
+
+            function redirect(id, date, perPage) {
+                const nextPageUrl = `/userscript-archive/index.html?id=${id}&date=${date}&per-page=${perPage}`;
+                window.location.href = nextPageUrl;
+            }
+
+            function applyImageCategories(id) {
+                const image = document.querySelector(`.image-container[data-id="${id}"]`);
+                fetch('https://corsproxy.io/?' + encodeURIComponent('https://myfigurecollection.net/?_tb=commit'), {
+                        method: "POST",
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: `commit=loadTooltip&objectId=${id}&objectType=2`
+                    })
                     .then(response => response.json())
-                    .then(function(j) {
+                    .then(function (j) {
                         let container = document.createElement("div");
                         container.classList.add('tooltip');
                         container.innerHTML = j.htmlValues.TOOLTIP;
@@ -497,59 +623,82 @@
                         }
                         image.appendChild(container);
                     });
-        }
+                image.addEventListener('click', (event) => openImage(event, image));
+            }
 
-        function decodeHTML(html) {
-            const txt = document.createElement('textarea');
-            txt.innerHTML = html;
-            return txt.value.replace('&', '-');
-        }
+            function openImage(event, image) {
+                event.preventDefault();
+                document.querySelector('main').classList.add('image-open');
+                document.querySelector('.main-image').src = image.querySelector('img').src.replace('/thumbnails', '');
+                document.querySelector('.image-title').innerHTML = image.querySelector('.title').innerHTML;
+                document.querySelector('.main-image-container').href = `https://myfigurecollection.net/picture/${image.dataset.id}`;
+            }
 
-        function loadImages(count = globalPerPage) {
-            let successCount = 0;
-            const maxImages = count;
+            function closeImage() {
+                event.preventDefault();
+                document.querySelector('main').classList.remove('image-open');
+            }
 
-            while (successCount < maxImages) {
-                let currentDate = new Date(globalCurrent);
-                let prevDate = new Date(globalPrev);
+            function decodeHTML(html) {
+                const txt = document.createElement('textarea');
+                txt.innerHTML = html;
+                return txt.value.replace('&', '-');
+            }
 
-                console.log(currentDate.toDateString())
-                console.log(prevDate.toDateString())
-                const dateString = `${currentDate.getFullYear()}/${(currentDate.getMonth() + 1).toString().padStart(2, '0')}/${currentDate.getDate().toString().padStart(2, '0')}`;
-                const prevDateString = `${prevDate.getFullYear()}/${(prevDate.getMonth() + 1).toString().padStart(2, '0')}/${prevDate.getDate().toString().padStart(2, '0')}`;
-                const jpegUrl = `${baseUrl}${dateString}/thumbnails/${imageId}.jpeg`;
-                const pngUrl = `${baseUrl}${dateString}/thumbnails/${imageId}.png`;
-                const gifUrl = `${baseUrl}${dateString}/thumbnails/${imageId}.gif`;
-                const prevJpegUrl = `${baseUrl}${prevDateString}/thumbnails/${imageId}.jpeg`;
-                const prevPngUrl = `${baseUrl}${prevDateString}/thumbnails/${imageId}.png`;
-                const prevGifUrl = `${baseUrl}${prevDateString}/thumbnails/${imageId}.gif`;
-                const figureUrl = `https://myfigurecollection.net/picture/${imageId}`;
+            function loadImages(count = globalPerPage) {
+                let successCount = 0;
+                const maxImages = count;
 
-                // Create an image element
-                const img = new Image();
-                img.src = jpegUrl;
-                img.dataset.id = imageId;
+                while (successCount < maxImages) {
+                    let currentDate = new Date(globalCurrent);
+                    let prevDate = new Date(globalPrev);
 
-                img.onerror = function () {
-                    img.src = pngUrl;
+                    //console.log(currentDate.toDateString())
+                    //console.log(prevDate.toDateString())
+                    const dateString = `${currentDate.getFullYear()}/${(currentDate.getMonth() + 1).toString().padStart(2, '0')}/${currentDate.getDate().toString().padStart(2, '0')}`;
+                    const prevDateString = `${prevDate.getFullYear()}/${(prevDate.getMonth() + 1).toString().padStart(2, '0')}/${prevDate.getDate().toString().padStart(2, '0')}`;
+                    const jpegUrl = `${baseUrl}${dateString}/thumbnails/${imageId}.jpeg`;
+                    const pngUrl = `${baseUrl}${dateString}/thumbnails/${imageId}.png`;
+                    const gifUrl = `${baseUrl}${dateString}/thumbnails/${imageId}.gif`;
+                    const prevJpegUrl = `${baseUrl}${prevDateString}/thumbnails/${imageId}.jpeg`;
+                    const prevPngUrl = `${baseUrl}${prevDateString}/thumbnails/${imageId}.png`;
+                    const prevGifUrl = `${baseUrl}${prevDateString}/thumbnails/${imageId}.gif`;
+                    const figureUrl = `https://myfigurecollection.net/picture/${imageId}`;
+
+                    // Create an image element
+                    const img = new Image();
+                    img.src = jpegUrl;
+                    img.dataset.id = imageId;
 
                     img.onerror = function () {
-                        // If JPEG fails, try GIF
-                        img.src = gifUrl;
+                        img.src = pngUrl;
 
                         img.onerror = function () {
-                            img.src = prevJpegUrl;
+
+                            // If JPEG fails, try GIF
+                            img.src = gifUrl;
 
                             img.onerror = function () {
-                                img.src = prevPngUrl;
+                                img.src = prevJpegUrl;
 
                                 img.onerror = function () {
-                                    img.src = prevGifUrl;
+                                    img.src = prevPngUrl;
 
                                     img.onerror = function () {
-                                        //private image
-                                        imageId--;
-                                        successCount++;
+                                        img.src = prevGifUrl;
+
+                                        img.onerror = function () {
+
+                                            //private image
+                                            imageId--;
+                                            successCount++;
+                                        };
+
+                                        img.onload = function () {
+                                            currentDate.setDate(currentDate.getDate() - 1);
+                                            prevDate.setDate(prevDate.getDate() - 1);
+                                            appendImage();
+                                        };
                                     };
 
                                     img.onload = function () {
@@ -557,105 +706,100 @@
                                         prevDate.setDate(prevDate.getDate() - 1);
                                         appendImage();
                                     };
-                                };
+                                }
 
                                 img.onload = function () {
                                     currentDate.setDate(currentDate.getDate() - 1);
                                     prevDate.setDate(prevDate.getDate() - 1);
                                     appendImage();
                                 };
-                            }
-
-                            img.onload = function () {
-                                currentDate.setDate(currentDate.getDate() - 1);
-                                prevDate.setDate(prevDate.getDate() - 1);
-                                appendImage();
                             };
-                        };
+                            img.onload = function () {
+                                appendImage();
+                            }
+                        }
                         img.onload = function () {
                             appendImage();
                         }
-                    }
+                    };
+
                     img.onload = function () {
                         appendImage();
                     }
-                };
 
-                img.onload = function () {
-                    appendImage();
-                }
+                    function apependImage() {
+                        img.dataset.id = imageId;
+                        const anchor = document.createElement('a');
+                        anchor.href = figureUrl;
+                        anchor.target = "_blank"; // Open link in a new tab
+                        anchor.appendChild(img);
 
-                function apependImage() {
-                    img.dataset.id = imageId;
-                    const anchor = document.createElement('a');
-                    anchor.href = figureUrl;
-                    anchor.target = "_blank"; // Open link in a new tab
-                    anchor.appendChild(img);
-
-                    // Append the anchor (with image) to the container
-                    imageContainer.appendChild(anchor);
-                    console.log(`Loaded image: ${img.src}`);
-                    successCount++;
-                }
-
-                function appendImage() {
-                    globalCurrent.setDate(currentDate.getDate());
-                    globalPrev.setDate(prevDate.getDate());
-                    const anchor = document.createElement('a');
-                    anchor.classList.add('image-container');
-                    anchor.href = figureUrl;
-                    anchor.target = "_blank"; // Open link in a new tab
-                    anchor.appendChild(img);
-
-                    anchor.dataset.date = currentDate.toISOString().split('T')[0];
-                    anchor.dataset.id = img.dataset.id;
-                    const num = parseInt(img.dataset.id);
-
-                    // Find the largest dataset ID that is smaller than the current imageId
-                    let largestSmallerImage = null;
-                    let largestId = -1; // Start with an invalid ID
-
-                    // Get all images currently in the container
-                    const existingImages = document.querySelectorAll('a.image-container');
-
-                    existingImages.forEach(existingAnchor => {
-                        const existingImg = existingAnchor.querySelector('img'); // Assuming each anchor contains an img
-                        const existingId = parseInt(existingImg.dataset.id); // Assuming dataset id is stored here
-                        //console.log(existingId)
-
-                        if (existingId < num && existingId > largestId) {
-                            largestId = existingId;
-                            largestSmallerImage = existingAnchor; // Keep a reference to the anchor
-                        }
-                    });
-
-                    // Append the new image before the found image or at the end if none is found
-                    if (largestSmallerImage) {
-                        // Insert the new anchor before the found anchor
-                        imageContainer.insertBefore(anchor, largestSmallerImage);
-                    } else {
-                        // If no smaller image was found, append to the end
+                        // Append the anchor (with image) to the container
                         imageContainer.appendChild(anchor);
+                        console.log(`Loaded image: ${img.src}`);
+                        successCount++;
                     }
 
-                    applyImageCategories(img.dataset.id);
-                    console.log(globalCurrent.toDateString())
-                    console.log(globalPrev.toDateString())
-                    console.log(`Loaded image: ${img.src}`);
+                    function appendImage() {
+                        globalCurrent.setDate(currentDate.getDate());
+                        globalPrev.setDate(prevDate.getDate());
+                        const anchor = document.createElement('a');
+                        anchor.classList.add('image-container');
+                        anchor.href = figureUrl;
+                        anchor.target = "_blank"; // Open link in a new tab
+                        anchor.appendChild(img);
+
+                        anchor.dataset.date = currentDate.toISOString().split('T')[0];
+                        anchor.dataset.id = img.dataset.id;
+                        const num = parseInt(img.dataset.id);
+
+                        // Find the largest dataset ID that is smaller than the current imageId
+                        let largestSmallerImage = null;
+                        let largestId = -1; // Start with an invalid ID
+
+                        // Get all images currently in the container
+                        const existingImages = document.querySelectorAll('a.image-container');
+
+                        existingImages.forEach(existingAnchor => {
+                            const existingImg = existingAnchor.querySelector('img'); // Assuming each anchor contains an img
+                            const existingId = parseInt(existingImg.dataset.id); // Assuming dataset id is stored here
+                            //console.log(existingId)
+
+                            if (existingId < num && existingId > largestId) {
+                                largestId = existingId;
+                                largestSmallerImage = existingAnchor; // Keep a reference to the anchor
+                            }
+                        });
+
+                        // Append the new image before the found image or at the end if none is found
+                        if (largestSmallerImage) {
+
+                            // Insert the new anchor before the found anchor
+                            imageContainer.insertBefore(anchor, largestSmallerImage);
+                        } else {
+
+                            // If no smaller image was found, append to the end
+                            imageContainer.appendChild(anchor);
+                        }
+
+                        applyImageCategories(img.dataset.id);
+                        console.log(globalCurrent.toDateString())
+                        console.log(globalPrev.toDateString())
+                        console.log(`Loaded image: ${img.src}`);
+                    }
+
+                    successCount++; // Increment regardless of success or failure
+
+                    imageId--; // Decrement the image number
+
+                    // If no image found for this day, move to the previous date
                 }
 
-				successCount++;  // Increment regardless of success or failure
-
-                imageId--;  // Decrement the image number
-
-				// If no image found for this day, move to the previous date
+                console.log(`Finished loading ${count} images.`);
             }
 
-            console.log(`Finished loading ${count} images.`);
-        }
-
-        // Load the first 100 images
-        loadImages();
-    </script>
-</body>
+            // Load the first 100 images
+            loadImages();
+        </script>
+    </body>
 </html>
