@@ -704,7 +704,7 @@
                             imageElement.src = imageElement.src.replace('/600', '');
 
                             imageElement.onload = function() {
-                                if (index >= 8) {
+                                if (index >= 4) {
                                     currentDate.setDate(currentDate.getDate() - 1);
                                     prevDate.setDate(prevDate.getDate() - 1);
                                 }
@@ -713,7 +713,7 @@
                         };
 
                         imageElement.onload = function() {
-                            if (index >= 8) {
+                            if (index >= 4) {
                                 currentDate.setDate(currentDate.getDate() - 1);
                                 prevDate.setDate(prevDate.getDate() - 1);
                             }
