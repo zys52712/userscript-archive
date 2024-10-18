@@ -174,7 +174,7 @@
                     justify-content: center;
 
                     img {
-                        height: 196px;
+                        height: 192px;
                         object-fit: contain;
                         max-width: 512px;
                     }
@@ -266,7 +266,6 @@
 
                             .error {
                                 margin: auto;
-                                /* height: 196px; */
                                 text-align: center;
                                 align-content: center;
                                 height: -webkit-fill-available;
@@ -489,7 +488,7 @@
             }
 
             function getUrl(date, id, extension) {
-                return `${baseUrl}${date}/thumbnails/${imageId}.${extension}`;
+                return `${baseUrl}${date}/600/${imageId}.${extension}`;
             }
 
             function changeStartID(event) {
@@ -629,7 +628,7 @@
             function openImage(event, image) {
                 event.preventDefault();
                 document.querySelector('main').classList.add('image-open');
-                document.querySelector('.main-image').src = image.querySelector('img').src.replace('/thumbnails', '');
+                document.querySelector('.main-image').src = image.querySelector('img').src.replace('/thumbnails', '').replace('/600', '');
                 document.querySelector('.image-title').innerHTML = image.querySelector('.title')?.innerHTML ?? '404';
                 document.querySelector('.main-image-container').href = `https://myfigurecollection.net/picture/${image.dataset.id}`;
             }
@@ -653,92 +652,79 @@
                     let currentDate = new Date(globalCurrent);
                     let prevDate = new Date(globalPrev);
 
-                    //console.log(currentDate.toDateString())
-                    //console.log(prevDate.toDateString())
+                    //console.log(currentDate.toDateString());
+                    //console.log(prevDate.toDateString());
                     const dateString = `${currentDate.getFullYear()}/${(currentDate.getMonth() + 1).toString().padStart(2, '0')}/${currentDate.getDate().toString().padStart(2, '0')}`;
                     const prevDateString = `${prevDate.getFullYear()}/${(prevDate.getMonth() + 1).toString().padStart(2, '0')}/${prevDate.getDate().toString().padStart(2, '0')}`;
-                    const jpegUrl = `${baseUrl}${dateString}/thumbnails/${imageId}.jpeg`;
-                    const pngUrl = `${baseUrl}${dateString}/thumbnails/${imageId}.png`;
-                    const gifUrl = `${baseUrl}${dateString}/thumbnails/${imageId}.gif`;
-                    const prevJpegUrl = `${baseUrl}${prevDateString}/thumbnails/${imageId}.jpeg`;
-                    const prevPngUrl = `${baseUrl}${prevDateString}/thumbnails/${imageId}.png`;
-                    const prevGifUrl = `${baseUrl}${prevDateString}/thumbnails/${imageId}.gif`;
                     const figureUrl = `https://myfigurecollection.net/picture/${imageId}`;
+                    const formats = ['jpeg', 'png', 'gif', 'webp'];
 
-                    // Create an image element
-                    const img = new Image();
-                    img.src = jpegUrl;
-                    img.dataset.id = imageId;
+                    let imageUrls = [];
 
-                    img.onerror = function () {
-                        img.src = pngUrl;
+                    formats.forEach((format) => {
+                        imageUrls.push(`${baseUrl}${dateString}/thumbnails/${imageId}.${format}`)
+                    });
 
-                        img.onerror = function () {
+                    formats.forEach((format) => {
+                        imageUrls.push(`${baseUrl}${prevDateString}/thumbnails/${imageId}.${format}`)
+                    });
 
-                            // If JPEG fails, try GIF
-                            img.src = gifUrl;
+                    function loadImage(imageElement, urls, index = 0) {
+                        if (index >= urls.length) {
+                            imageId--;
+                            successCount++;
+                            return;
+                        }
 
-                            img.onerror = function () {
-                                img.src = prevJpegUrl;
+                        imageElement.src = urls[index];
 
-                                img.onerror = function () {
-                                    img.src = prevPngUrl;
+                        imageElement.onerror = function() {
+                            loadImage(imageElement, urls, index + 1);
+                        };
 
-                                    img.onerror = function () {
-                                        img.src = prevGifUrl;
+                        imageElement.onload = function() {
+                            if (imageElement.naturalHeight < 150) {
+                                attemptHighRes(imageElement, index);
+                            }
 
-                                        img.onerror = function () {
-
-                                            //private image
-                                            imageId--;
-                                            successCount++;
-                                        };
-
-                                        img.onload = function () {
-                                            currentDate.setDate(currentDate.getDate() - 1);
-                                            prevDate.setDate(prevDate.getDate() - 1);
-                                            appendImage();
-                                        };
-                                    };
-
-                                    img.onload = function () {
-                                        currentDate.setDate(currentDate.getDate() - 1);
-                                        prevDate.setDate(prevDate.getDate() - 1);
-                                        appendImage();
-                                    };
-                                }
-
-                                img.onload = function () {
+                            else {
+                                if (index >= 4) {
                                     currentDate.setDate(currentDate.getDate() - 1);
                                     prevDate.setDate(prevDate.getDate() - 1);
-                                    appendImage();
-                                };
-                            };
-                            img.onload = function () {
+                                }
                                 appendImage();
                             }
-                        }
-                        img.onload = function () {
+                        };
+                    }
+
+                    function attemptHighRes(imageElement, index) {
+                        imageElement.src = imageElement.src.replace('/thumbnails', '/600');
+                        imageElement.onerror = function() {
+                            console.log(imageElement.src.replace('/600', ''))
+                            imageElement.src = imageElement.src.replace('/600', '');
+
+                            imageElement.onload = function() {
+                                if (index >= 8) {
+                                    currentDate.setDate(currentDate.getDate() - 1);
+                                    prevDate.setDate(prevDate.getDate() - 1);
+                                }
+                                appendImage();
+                            }
+                        };
+
+                        imageElement.onload = function() {
+                            if (index >= 8) {
+                                currentDate.setDate(currentDate.getDate() - 1);
+                                prevDate.setDate(prevDate.getDate() - 1);
+                            }
                             appendImage();
                         }
-                    };
-
-                    img.onload = function () {
-                        appendImage();
                     }
 
-                    function apependImage() {
-                        img.dataset.id = imageId;
-                        const anchor = document.createElement('a');
-                        anchor.href = figureUrl;
-                        anchor.target = "_blank"; // Open link in a new tab
-                        anchor.appendChild(img);
+                    const img = new Image();
+                    img.dataset.id = imageId;
 
-                        // Append the anchor (with image) to the container
-                        imageContainer.appendChild(anchor);
-                        console.log(`Loaded image: ${img.src}`);
-                        successCount++;
-                    }
+                    loadImage(img, imageUrls);
 
                     function appendImage() {
                         globalCurrent.setDate(currentDate.getDate());
@@ -773,11 +759,9 @@
 
                         // Append the new image before the found image or at the end if none is found
                         if (largestSmallerImage) {
-
                             // Insert the new anchor before the found anchor
                             imageContainer.insertBefore(anchor, largestSmallerImage);
                         } else {
-
                             // If no smaller image was found, append to the end
                             imageContainer.appendChild(anchor);
                         }
