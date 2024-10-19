@@ -11,9 +11,11 @@
                 background: #2a2a2a;
                 color: #DDDDDD;
                 margin: 0;
+                overflow-x: hidden;
                 --box-shadow: 2px 2px 2px rgba(0, 0, 0, .2);
                 --width: min(1440px, calc(100vw - 50px));
                 --panel-width: min(600px, 35vw);
+                --width-with-panel: calc(100vw - 60px - calc(var(--panel-width) + 30px));
                 --offset: 40px;
             }
 
@@ -46,10 +48,14 @@
 
                 &.image-open {
                     .main-container {
-                        max-width: calc(100vw - 60px - calc(var(--panel-width) + 30px));
+                        max-width: var(--width-with-panel);
 
                         .images {
-                            max-width: calc(100vw - 60px - calc(var(--panel-width) + 30px));
+                            width: var(--width-with-panel);
+
+                            img {
+                                max-width: min(512px, calc(var(--width-with-panel) - 18px));
+                            }
                         }
                     }
 
@@ -98,6 +104,7 @@
 
                     img {
                         width: var(--panel-width);
+                        overflow: hidden;
                     }
                 }
             }
