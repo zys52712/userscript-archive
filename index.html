@@ -592,7 +592,7 @@
                     .then(response => response.text()) // or response.json() for JSON content
                 .then(html => {
                     const parser = new DOMParser();
-                    const id = parser.parseFromString(html, 'text/html').querySelector('.picture-icons .picture-icon:last-child meta').content.split(':')[1];
+                    const id = [...parser.parseFromString(html, 'text/html').querySelectorAll('.picture-icons .picture-icon:not(.off) meta')].pop().content.split(':')[1];
 
                     console.log(id);
 
