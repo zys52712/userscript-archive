@@ -421,6 +421,62 @@
                     margin: 0 0 0 auto;
                 }
             }
+
+            #message {
+                display: block;
+                top: 0;
+                opacity: 0;
+                transition: opacity 0.3s, transform 0.3s;
+                pointer-events: none;
+                position: fixed;
+                left: 50%;
+                transform: translate(-50%, 16px);
+                z-index: 9;
+                background: rgba(66, 66, 66, .6);
+                box-shadow: 0 0 10px rgba(0, 0, 0, .4);
+                backdrop-filter: blur(6px);
+                border-radius: 8px;
+
+                &.active {
+                    transform: translate(-50%, 32px);
+                    opacity: 1;
+                }
+
+                .wrapper {
+                    width: 25vw;
+                    margin: auto;
+
+                    width: 320px;
+                    z-index: 20;
+                    white-space: normal;
+
+                    div {
+                        text-align: center;
+                        margin: 11px;
+                        padding: 11px;
+                        line-height: 128px;
+                        font-size: 24px;
+
+                        margin: auto;
+                        text-align: center;
+                        align-content: center;
+                        height: -webkit-fill-available;
+                        font-weight: 700;
+                        position: relative;
+
+                        &::before {
+                            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Crect width='256' height='256' fill='none'/%3E%3Ccircle cx='128' cy='128' r='96' opacity='0.2' fill='%23f0f'/%3E%3Cline x1='195.88' y1='195.88' x2='60.12' y2='60.12' fill='none' stroke='%23f0f' stroke-linecap='round' stroke-linejoin='round' stroke-width='12'/%3E%3Ccircle cx='128' cy='128' r='96' fill='none' stroke='%23f0f' stroke-miterlimit='10' stroke-width='12'/%3E%3C/svg%3E");
+                            content: " ";
+                            position: absolute;
+                            width: 136px;
+                            left: 92px;
+                            height: 136px;
+                            top: 7px;
+                            z-index: -1;
+                        }
+                    }
+                }
+            }
         </style>
     </head>
     <body>
@@ -431,6 +487,13 @@
                 <button class="load-custom" onclick="lastViewableImage()">Load last viewable image</button>
             </div>
         </header>
+        <div id="message" class="">
+            <div class="wrapper">
+                <div class="success">
+                    MFC service unavailable
+                </div>
+            </div>
+        </div>
         <main>
             <div class="main-container">
                 <div class="input-container">
@@ -553,6 +616,14 @@
                 redirect(lastImage.dataset.id, lastImage.dataset.date, globalPerPage);
             }
 
+            function is404( doc ) {
+                if (doc.querySelector('body > img:first-child + div > strong')) {
+                    console.log('404')
+                    return true;
+                }
+                return false;
+            }
+
             function newestImage() {
                 const url = 'https://corsproxy.io/?' + encodeURIComponent('https://myfigurecollection.net/picture/');
                 const convertDate = d => d.split("/").reverse().join("-");
@@ -561,26 +632,37 @@
                     .then(response => response.text()) // or response.json() for JSON content
                 .then(html => {
                     const parser = new DOMParser();
-                    const id = parser.parseFromString(html, 'text/html').querySelector('.picture-icons .picture-icon:not(.off) meta').content.split(':')[1];
+                    const doc = parser.parseFromString(html, 'text/html');
 
-                    console.log(id);
+                    if (! is404( doc )) {
+                        const id = doc.querySelector('.picture-icons .picture-icon:not(.off) meta').content.split(':')[1];
 
-                    fetch('https://corsproxy.io/?' + encodeURIComponent('https://myfigurecollection.net/?_tb=commit'), {
-                            method: "POST",
-                            headers: {
-                                'Content-Type': 'application/x-www-form-urlencoded'
-                            },
-                            body: `commit=loadTooltip&objectId=${id}&objectType=2`
-                        })
-                        .then(response => response.json())
-                        .then(function (j) {
-                            let container = document.createElement("div");
-                            container.innerHTML = j.htmlValues.TOOLTIP;
-                            const date = container.querySelector('.time span').title.split(', ')[0].replace('/', '-');
-                            console.log(date)
+                        console.log(id);
 
-                            redirect(id, convertDate(date), globalPerPage)
-                        });
+                        fetch('https://corsproxy.io/?' + encodeURIComponent('https://myfigurecollection.net/?_tb=commit'), {
+                                method: "POST",
+                                headers: {
+                                    'Content-Type': 'application/x-www-form-urlencoded'
+                                },
+                                body: `commit=loadTooltip&objectId=${id}&objectType=2`
+                            })
+                            .then(response => response.json())
+                            .then(function (j) {
+                                let container = document.createElement("div");
+                                container.innerHTML = j.htmlValues.TOOLTIP;
+                                const date = container.querySelector('.time span').title.split(', ')[0].replace('/', '-');
+                                console.log(date)
+
+                                redirect(id, convertDate(date), globalPerPage)
+                            });
+                    }
+                    else {
+                        document.querySelector('#message').classList.add('active');
+
+                        setTimeout(() => {
+                            document.querySelector('#message').classList.remove('active');
+                        }, 6000)
+                    }
                 });
             }
 
@@ -592,26 +674,37 @@
                     .then(response => response.text()) // or response.json() for JSON content
                 .then(html => {
                     const parser = new DOMParser();
-                    const id = [...parser.parseFromString(html, 'text/html').querySelectorAll('.picture-icons .picture-icon:not(.off) meta')].pop().content.split(':')[1];
+                    const doc = parser.parseFromString(html, 'text/html');
 
-                    console.log(id);
+                    if (! is404( doc )) {
+                        const id = [...doc.querySelectorAll('.picture-icons .picture-icon:not(.off) meta')].pop().content.split(':')[1];
 
-                    fetch('https://corsproxy.io/?' + encodeURIComponent('https://myfigurecollection.net/?_tb=commit'), {
-                            method: "POST",
-                            headers: {
-                                'Content-Type': 'application/x-www-form-urlencoded'
-                            },
-                            body: `commit=loadTooltip&objectId=${id}&objectType=2`
-                        })
-                        .then(response => response.json())
-                        .then(function (j) {
-                            let container = document.createElement("div");
-                            container.innerHTML = j.htmlValues.TOOLTIP;
-                            const date = container.querySelector('.time span').title.split(', ')[0].replace('/', '-');
-                            console.log(date)
+                        console.log(id);
 
-                            redirect(id, convertDate(date), globalPerPage)
-                        });
+                        fetch('https://corsproxy.io/?' + encodeURIComponent('https://myfigurecollection.net/?_tb=commit'), {
+                                method: "POST",
+                                headers: {
+                                    'Content-Type': 'application/x-www-form-urlencoded'
+                                },
+                                body: `commit=loadTooltip&objectId=${id}&objectType=2`
+                            })
+                            .then(response => response.json())
+                            .then(function (j) {
+                                let container = document.createElement("div");
+                                container.innerHTML = j.htmlValues.TOOLTIP;
+                                const date = container.querySelector('.time span').title.split(', ')[0].replace('/', '-');
+                                console.log(date)
+
+                                redirect(id, convertDate(date), globalPerPage)
+                            });
+                    }
+                    else {
+                        document.querySelector('#message').classList.add('active');
+
+                        setTimeout(() => {
+                            document.querySelector('#message').classList.remove('active');
+                        }, 6000)
+                    }
                 });
             }
 
