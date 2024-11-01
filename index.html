@@ -16,6 +16,14 @@
                 --panel-width: min(700px, 35vw);
                 --width-with-panel: min(1440px, calc(100vw - 60px - calc(var(--panel-width) + 30px)));
                 --offset: 40px;
+
+                @media screen and (max-device-width: 900px) and (-webkit-min-device-pixel-ratio: 2) {
+                    overflow-x: hidden;
+                }
+
+                @media screen and (max-width: 1440px) {
+                    overflow-x: hidden;
+                }
             }
 
             header {
@@ -25,8 +33,37 @@
                 display: flex;
                 place-content: space-between;
 
-                h1 {
-                    margin: 0;
+                &.last-available,
+                &.newest {
+                    padding: 17px 40px;
+
+                    .buttons {
+                        margin: 8px 0;
+                    }
+                }
+
+                &.last-available span.last-available {
+                    display: block;
+                }
+
+                &.newest span.newest {
+                    display: block;
+                }
+
+                .title {
+                    display: grid;
+                    cursor: pointer;
+
+                    h1 {
+                        line-height: 40px;
+                        margin: 0;
+                    }
+
+                    span {
+                        font-size: 14px;
+                        line-height: 16px;
+                        display: none;
+                    }
                 }
 
                 .buttons {
@@ -117,10 +154,6 @@
                 gap: 20px;
                 transition: max-width 0.5s;
 
-                @media screen and (max-device-width: 900px) and (-webkit-min-device-pixel-ratio: 2) {
-                    overflow-x: hidden;
-                }
-
                 .input-container {
                     background-color: #272727;
                     padding: 15px;
@@ -141,6 +174,7 @@
                         font-size: 18px;
                         width: 14ch;
                         margin-right: 16px;
+                        border-bottom: 1px solid #bbbbbb;
 
                         &:focus-visible {
                             outline: none;
@@ -212,6 +246,13 @@
                                 opacity: 1;
                                 transform: translate(-50%, calc(-100% - 16px));
                             }
+                        }
+
+                        .input {
+                            display: flex;
+                            align-items: center;
+                            gap: 5px;
+                            height: 24px;
                         }
 
                         .tooltip {
@@ -477,14 +518,156 @@
                     }
                 }
             }
+
+            #loading {
+                position: fixed;
+                inset: 0;
+                background: #222222;
+                z-index: 1;
+                opacity: 0;
+                pointer-events: none;
+                display: flex;
+                transition: opacity 0.5s;
+
+                div {
+                    margin: auto;
+                    opacity: 0;
+                    transition: opacity 0.5s;
+                }
+
+                &.active {
+                    div {
+                        margin: auto;
+                        animation: blink 1s ease-in-out infinite;
+                    }
+
+                    opacity: 1;
+                    transition: none;
+                    pointer-events: none;
+                }
+            }
+
+            @keyframes blink {
+                0%, 100% {
+                    opacity: 0;
+                }
+                50% {
+                    opacity: 1;
+                }
+            }
+
+            #imageLoading {
+                position: fixed;
+                top: 0;
+                right: 0;
+                left: 0;
+                z-index: 9;
+                pointer-events: none;
+                opacity: 0;
+                transition: opacity 0.5s;
+
+                &.active {
+                    opacity: 1;
+                }
+
+                .wrapper {
+                    width: 32px;
+                    margin: auto;
+                    padding: 8px;
+                    border-radius: 0 0 24px 24px;
+                    text-align: center;
+                    box-shadow: 0 0 5px rgba(0, 0, 0, .6);
+                    background-color: #427931;
+                }
+            }
+
+            body:not(.has-images) {
+                height: 100vh;
+                overflow-y: hidden;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+
+                header {
+                    width: min(800px, calc(100vw - 140px));
+                    max-width: min(800px, calc(100vw - 140px));
+                    margin: 0 auto;
+                    border-top-left-radius: 43px;
+                    border-top-right-radius: 43px;
+                    padding: 40px 30px 25px;
+                    gap: 20px;
+
+                    .title {
+                        margin-left: 10px;
+                    }
+                }
+
+                main {
+                    width: min(860px, calc(100vw - 80px));
+                    max-width: min(860px, calc(100vw - 80px));
+                    margin: 0 auto;
+                    border-top-left-radius: 0;
+                    border-top-right-radius: 0;
+
+                    #loadMoreBtn {
+                        display: none;
+                    }
+
+                    .main-container {
+                        overflow-x: hidden;
+                        width: unset;
+                        max-width: unset;
+                        display: initial;
+                        padding: 10px 30px 40px;
+
+                        .input-container {
+                            padding: 0;
+                            margin: 0;
+                            display: grid;
+                            grid-template-columns: 1fr auto;
+                            gap: 15px;
+                            justify-self: center;
+                            border-radius: 12px;
+                            background-color: transparent;
+                            grid-column-gap: 50px;
+                        }
+
+                        .input {
+                            padding: 16px;
+                            background-color: #272727;
+                            border-radius: 24px;
+                            grid-column: 1 / 1;
+
+                            &:nth-child(2) {
+                                line-height: 21px;
+                            }
+
+                            &:nth-child(3) {
+                                padding: 7.5px 16px;
+                                height: unset;
+                            }
+                        }
+
+                        .load-custom {
+                            margin: 8px auto 0;
+                            grid-row: 2 / 2;
+                            grid-column: 2 / 2;
+                        }
+                    }
+                }
+            }
         </style>
     </head>
     <body>
         <header>
-            <h1>MFC Doomscroll</h1>
+            <div class="title" onclick="redirectHome()">
+                <h1>MFC Doomscroll</h1>
+                <span class="newest">Bookmark this page to auto load newest image</span>
+                <span class="last-available">Bookmark this page to auto load last available image</span>
+            </div>
             <div class="buttons">
-                <button class="load-custom" onclick="newestImage()">Load newest image</button>
-                <button class="load-custom" onclick="lastViewableImage()">Load last viewable image</button>
+                <button class="load-custom" onclick="redirectNewest()">Newest image</button>
+                <button class="load-custom" onclick="redirectLastAvailable()">Last viewable</button>
             </div>
         </header>
         <div id="message" class="">
@@ -494,21 +677,37 @@
                 </div>
             </div>
         </div>
+        <div id="loading" class="">
+            <div class="wrapper">
+                <h1>Loading...</h1>
+            </div>
+        </div>
+        <div id="imageLoading" style="/* display: none; */">
+            <div class="wrapper">
+                <img src="https://static.myfigurecollection.net/ressources/loading.svg" alt="Loading">
+            </div>
+        </div>
         <main>
             <div class="main-container">
                 <div class="input-container">
-                    <span>Starting ID:</span>
-                    <input id="startingId" type="number" oninput="changeStartID(event)" placeholder="initial ID" value="4177191"/>
-                    <span>Starting Date:</span>
-                    <input id="startingDate" type="date" oninput="changeStartDate(event)" placeholder="initial date" value="2024-10-16"/>
-                    <span for="itemsPerPage">Images per page:</span>
-                    <select id="itemsPerPage" onchange="changePerPage(event)" default="100">
-                        <option value="50">50</option>
-                        <option value="100" selected>100</option>
-                        <option value="250">250</option>
-                        <option value="500">500</option>
-                        <option value="1000">1000</option>
-                    </select>
+                    <div class="input">
+                        <span>Starting ID:</span>
+                        <input id="startingId" type="number" oninput="changeStartID(event)" placeholder="initial ID" value="4177191"/>
+                    </div>
+                    <div class="input">
+                        <span>Starting Date:</span>
+                        <input id="startingDate" type="date" oninput="changeStartDate(event)" placeholder="initial date" value="2024-10-16"/>
+                    </div>
+                    <div class="input">
+                        <span for="itemsPerPage">Images per page:</span>
+                        <select id="itemsPerPage" onchange="changePerPage(event)" default="100">
+                            <option value="50">50</option>
+                            <option value="100" selected>100</option>
+                            <option value="250">250</option>
+                            <option value="500">500</option>
+                            <option value="1000">1000</option>
+                        </select>
+                    </div>
                     <button class="load-custom" onclick="loadCustom()">Load</button>
                 </div>
                 <div class="images" id="imageContainer"></div>
@@ -530,6 +729,10 @@
                 </div>
             </div>
         </main>
+
+        <div class="loading-strip-container">
+          <div class="loading-strip"></div>
+        </div>
         <footer></footer>
         <script>
             let imageId = 4177191; // Starting point
@@ -544,8 +747,36 @@
             const date = params.get('date');
             const perPage = params.get('per-page');
 
+            const convertDate = d => d.split("/").reverse().join("-");
+
+            const baseUrl = "https://static.myfigurecollection.net/upload/pictures/";
+            const imageContainer = document.getElementById('imageContainer');
+            const loadMoreBtn = document.getElementById('loadMoreBtn');
+
+            const urlPrepend = '/userscript-archive/index.html';
+
+            if (perPage) {
+                document.getElementById('itemsPerPage').value = perPage;
+                globalPerPage = parseInt(perPage);
+            }
+
+            if (params.has('newest')) {
+                newestImage(false);
+                document.getElementById('loading').classList.add('active')
+                const image = document.querySelector('header').classList.add('newest');
+            }
+
+            if (params.has('last-available')) {
+                lastViewableImage(false);
+                document.getElementById('loading').classList.add('active')
+                const image = document.querySelector('header').classList.add('last-available');
+            }
+
+            let lastDate = new Date(globalCurrent);
+            let lastImage = imageId;
+
             if (id && date) {
-                imageId = id;
+                imageId = parseInt(id);
                 let selectedDate = date.split('-');
                 globalCurrent = new Date(selectedDate[0], selectedDate[1] - 1, selectedDate[2]);
                 globalPrev = new Date(globalCurrent);
@@ -556,16 +787,12 @@
 
                 console.log(globalCurrent.toDateString())
                 console.log(globalPrev.toDateString())
-            }
 
-            if (perPage) {
-                document.getElementById('itemsPerPage').value = perPage;
-                globalPerPage = perPage;
-            }
+                lastDate = new Date(globalCurrent);
+                lastImage = imageId;
 
-            const baseUrl = "https://static.myfigurecollection.net/upload/pictures/";
-            const imageContainer = document.getElementById('imageContainer');
-            const loadMoreBtn = document.getElementById('loadMoreBtn');
+                loadImages();
+            }
 
             async function fetchImagePage(id) {
                 const mainImageUrl = `https://myfigurecollection.net/picture/${id}`;
@@ -618,15 +845,15 @@
 
             function is404( doc ) {
                 if (doc.querySelector('body > img:first-child + div > strong')) {
-                    console.log('404')
+                    console.log('404');
+                    document.querySelector('#loading').classList.remove('active');
                     return true;
                 }
                 return false;
             }
 
-            function newestImage() {
+            function newestImage( auto = true ) {
                 const url = 'https://corsproxy.io/?' + encodeURIComponent('https://myfigurecollection.net/picture/');
-                const convertDate = d => d.split("/").reverse().join("-");
 
                 fetch(url)
                     .then(response => response.text()) // or response.json() for JSON content
@@ -651,9 +878,14 @@
                                 let container = document.createElement("div");
                                 container.innerHTML = j.htmlValues.TOOLTIP;
                                 const date = container.querySelector('.time span').title.split(', ')[0].replace('/', '-');
-                                console.log(date)
+                                console.log(date);
 
-                                redirect(id, convertDate(date), globalPerPage)
+                                if (auto) {
+                                    redirect(id, convertDate(date), globalPerPage)
+                                }
+                                else {
+                                    handleAsyncLoad(id, date);
+                                }
                             });
                     }
                     else {
@@ -666,7 +898,20 @@
                 });
             }
 
-            function lastViewableImage() {
+            function handleAsyncLoad(id, date) {
+                imageId = id;
+                let selectedDate = convertDate(date).split('-');
+                globalCurrent = new Date(selectedDate[0], selectedDate[1] - 1, selectedDate[2]);
+                globalPrev = new Date(globalCurrent);
+                globalPrev.setDate(globalPrev.getDate() - 1);
+
+                document.getElementById('startingId').value = id;
+                document.getElementById('startingDate').value = convertDate(date);
+
+                loadImages();
+            }
+
+            function lastViewableImage( auto = true ) {
                 const url = 'https://corsproxy.io/?' + encodeURIComponent('https://myfigurecollection.net/?mode=browse&tab=overall&itemId=0&clubId=0&mySubscriptions=0&categoryId=0&sort=date&order=desc&current=tags&_tb=picture&acc=2000&page=40');
                 const convertDate = d => d.split("/").reverse().join("-");
 
@@ -695,7 +940,12 @@
                                 const date = container.querySelector('.time span').title.split(', ')[0].replace('/', '-');
                                 console.log(date)
 
-                                redirect(id, convertDate(date), globalPerPage)
+                                if (auto) {
+                                    redirect(id, convertDate(date), globalPerPage)
+                                }
+                                else {
+                                    handleAsyncLoad(id, date);
+                                }
                             });
                     }
                     else {
@@ -708,8 +958,20 @@
                 });
             }
 
+            function redirectHome() {
+                window.location.href = urlPrepend;
+            }
+
+            function redirectNewest() {
+                window.location.href = urlPrepend + `?newest&per-page=${globalPerPage}`;
+            }
+
+            function redirectLastAvailable() {
+                window.location.href = urlPrepend + `?last-available&per-page=${globalPerPage}`;
+            }
+
             function redirect(id, date, perPage) {
-                const nextPageUrl = `/userscript-archive/index.html?id=${id}&date=${date}&per-page=${perPage}`;
+                const nextPageUrl = `${urlPrepend}?id=${id}&date=${date}&per-page=${perPage}`;
                 window.location.href = nextPageUrl;
             }
 
@@ -759,12 +1021,20 @@
                 txt.innerHTML = html;
                 return txt.value.replace('&', '-');
             }
+            let once = false;
 
             function loadImages(count = globalPerPage) {
+                document.querySelector('body').classList.add('has-images');
                 let successCount = 0;
+                let imagesExpected = count;
+                let imagesOnpage = 0;
                 const maxImages = count;
 
-                while (successCount < maxImages) {
+                setTimeout(() => {
+                    document.querySelector('#imageLoading').classList.remove('active');
+                }, 60000)
+
+                while (successCount <= maxImages) {
                     let currentDate = new Date(globalCurrent);
                     let prevDate = new Date(globalPrev);
 
@@ -785,17 +1055,33 @@
                         imageUrls.push(`${baseUrl}${prevDateString}/thumbnails/${imageId}.${format}`)
                     });
 
-                    function loadImage(imageElement, urls, index = 0) {
-                        if (index >= urls.length) {
-                            imageId--;
-                            successCount++;
+                    function loadImage(imageId, imageElement, urls, index = 0) {
+                        //console.log(count)
+                        console.log('attempted')
+                        //console.log(` index ${index} urls[index] ${urls[index]}`)
+
+                        if (index >= urls.length - 1) {
+                            imagesExpected--;
+
+                            if (imagesOnpage === imagesExpected) {
+                                document.querySelector('#imageLoading').classList.remove('active');
+                            }
                             return;
                         }
+
+                        /*
+                        console.log(`index ${index} current ${currentDate.toDateString()} last ${lastDate.toDateString()} imageId ${imageId} lastImage ${lastImage}`)
+                        if (currentDate.getTime() > lastDate.getTime() && imageId < lastImage && index < 4) {
+                            console.log(`skipped, from ${index}`)
+                            loadImage(imageId, imageElement, urls, 4);
+                            return;
+                        }
+                        */
 
                         imageElement.src = urls[index];
 
                         imageElement.onerror = function() {
-                            loadImage(imageElement, urls, index + 1);
+                            loadImage(imageId, imageElement, urls, index + 1);
                         };
 
                         imageElement.onload = function() {
@@ -804,11 +1090,7 @@
                             }
 
                             else {
-                                if (index >= 4) {
-                                    currentDate.setDate(currentDate.getDate() - 1);
-                                    prevDate.setDate(prevDate.getDate() - 1);
-                                }
-                                appendImage();
+                                appendImage(imageId, index);
                             }
                         };
                     }
@@ -816,35 +1098,50 @@
                     function attemptHighRes(imageElement, index) {
                         imageElement.src = imageElement.src.replace('/thumbnails', '/600');
                         imageElement.onerror = function() {
-                            console.log(imageElement.src.replace('/600', ''))
+                            //console.log(imageElement.src.replace('/600', ''))
                             imageElement.src = imageElement.src.replace('/600', '');
 
                             imageElement.onload = function() {
-                                if (index >= 4) {
-                                    currentDate.setDate(currentDate.getDate() - 1);
-                                    prevDate.setDate(prevDate.getDate() - 1);
-                                }
-                                appendImage();
+                                appendImage(imageId, index);
                             }
                         };
 
                         imageElement.onload = function() {
-                            if (index >= 4) {
-                                currentDate.setDate(currentDate.getDate() - 1);
-                                prevDate.setDate(prevDate.getDate() - 1);
-                            }
-                            appendImage();
+                            appendImage(imageId, index);
+                        }
+                    }
+
+                    function check(imageId) {
+                        if (currentDate.getTime() < lastDate.getTime()) {
+                            lastDate = new Date(currentDate);
+                            lastImage = imageId;
+                            console.log('updated')
+                            console.log(imageId)
+                        }
+                        else if (currentDate.getTime() === lastDate.getTime() && imageId > lastImage) {
+                            lastDate = new Date(currentDate);
+                            lastImage = imageId;
+                            console.log('updated')
+                            console.log(imageId)
                         }
                     }
 
                     const img = new Image();
                     img.dataset.id = imageId;
 
-                    loadImage(img, imageUrls);
+                    loadImage(imageId, img, imageUrls);
 
-                    function appendImage() {
+                    function appendImage(imageId, index) {
+                        if (index >= 4) {
+                            currentDate.setDate(currentDate.getDate() - 1);
+                            prevDate.setDate(prevDate.getDate() - 1);
+                        }
+
+                        //check(imageId)
+
                         globalCurrent.setDate(currentDate.getDate());
                         globalPrev.setDate(prevDate.getDate());
+
                         const anchor = document.createElement('a');
                         anchor.classList.add('image-container');
                         anchor.href = figureUrl;
@@ -855,51 +1152,54 @@
                         anchor.dataset.id = img.dataset.id;
                         const num = parseInt(img.dataset.id);
 
-                        // Find the largest dataset ID that is smaller than the current imageId
                         let largestSmallerImage = null;
-                        let largestId = -1; // Start with an invalid ID
+                        let largestId = -1;
 
-                        // Get all images currently in the container
                         const existingImages = document.querySelectorAll('a.image-container');
 
                         existingImages.forEach(existingAnchor => {
-                            const existingImg = existingAnchor.querySelector('img'); // Assuming each anchor contains an img
-                            const existingId = parseInt(existingImg.dataset.id); // Assuming dataset id is stored here
+                            const existingImg = existingAnchor.querySelector('img');
+                            const existingId = parseInt(existingImg.dataset.id);
                             //console.log(existingId)
 
                             if (existingId < num && existingId > largestId) {
                                 largestId = existingId;
-                                largestSmallerImage = existingAnchor; // Keep a reference to the anchor
+                                largestSmallerImage = existingAnchor;
                             }
                         });
 
-                        // Append the new image before the found image or at the end if none is found
                         if (largestSmallerImage) {
-                            // Insert the new anchor before the found anchor
                             imageContainer.insertBefore(anchor, largestSmallerImage);
                         } else {
-                            // If no smaller image was found, append to the end
                             imageContainer.appendChild(anchor);
                         }
 
                         applyImageCategories(img.dataset.id);
-                        console.log(globalCurrent.toDateString())
-                        console.log(globalPrev.toDateString())
+                        //console.log(globalCurrent.toDateString());
+                        //console.log(globalPrev.toDateString());
                         console.log(`Loaded image: ${img.src}`);
+                        imagesOnpage++;
+
+                        if (!once) {
+                            document.querySelector('#loading').classList.remove('active');
+                            document.querySelector('#imageLoading').classList.add('active');
+                            console.log('added')
+                            once = true;
+                        }
+
+                        console.log(`imagesOnpage ${imagesOnpage} imagesExpected ${imagesExpected}.`);
+                        if (imagesOnpage === imagesExpected) {
+                            document.querySelector('#imageLoading').classList.remove('active');
+                        }
                     }
 
-                    successCount++; // Increment regardless of success or failure
+                    successCount++;
 
-                    imageId--; // Decrement the image number
-
-                    // If no image found for this day, move to the previous date
+                    imageId--;
                 }
 
                 console.log(`Finished loading ${count} images.`);
             }
-
-            // Load the first 100 images
-            loadImages();
         </script>
     </body>
 </html>
